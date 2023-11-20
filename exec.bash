@@ -3,5 +3,6 @@
 # Ejecutar makefile
 make && make clean
 
-# Ejecutar el ejecutable main
-./main
+# Ejecutar programa
+# $1: argumento del menu principal
+./main.bin $1
