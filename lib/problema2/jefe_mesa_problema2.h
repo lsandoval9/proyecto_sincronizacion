@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <semaphore.h>
-
+#include <time.h>
 
 #ifndef JEFE_MESA_PROBLEMA2_H
 
@@ -30,14 +30,20 @@ void reordenar_tablero()
         sem_wait(&reordenando);
     }
 
-    
+    // TODO
+
+
+    elegir_proxima_carta();
 
 }
 
 void pensar_reordenamiento()
 {
+    
+    while (true) {} // TODO: pensar reordenamiento
+
     printf("Jefe de mesa pensando reordenamiento\n");
-    sleep(1);
+    nanosleep((const struct timespec[]){{0, 500000000L}}, NULL);
 }
 
 void elegir_proxima_carta()

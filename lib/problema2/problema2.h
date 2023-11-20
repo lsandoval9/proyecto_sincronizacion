@@ -35,7 +35,7 @@ void *jefeMesa(void *arg);
 
 // semaforo
 sem_t mazo, reordenando, jugadores;
-sem_t mutex_mazo;
+sem_t mutex_mazo, mutex_jugadores, mutex_jefe;
 
 // contador jugadores
 int num_jugadores = 0;
@@ -98,16 +98,28 @@ void *jugador(void *arg)
 {
 
     Jugador *data = (struct Jugador *)arg;
+    sem_t aux_mutex;
+
+    sem_init(&aux_mutex, 0, 1);
 
     while (true)
     {
+
+
+
         pensar_jugada(*data);
 
-        
+        sem_wait(&aux_mutex);
+        num_jugadores++;
+        if (num_jugadores == 1) sem_wait(&mutex_jefe);
+        sem_post(&aux_mutex);
 
+        tomar_carta(*data);
     
         if (data->carta == CARTA_ESPERAR)
         {
+            num_jugadores--;
+            if (num_jugadores == 0) sem_post(&mutex_jefe);
             while (!reordenado)
             {
                 printf("Jugador %ld esperando reordenamiento\n", data->id);
@@ -122,6 +134,17 @@ void *jugador(void *arg)
 
 void *jefeMesa(void *arg)
 {
+
+    while (true)
+    {
+        sem_wait(&mutex_jefe);
+        reordenar();
+        reordenado = true;
+        sem_post(&reordenando);
+        sem_post(&mutex_jefe);
+    }
+
+    pthread_exit(NULL);
 }
 
 #endif // PROBLEMA2_H

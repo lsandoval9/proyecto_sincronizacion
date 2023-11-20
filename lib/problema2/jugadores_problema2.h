@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <semaphore.h>
+#include <time.h>
 
 #ifndef JUGADORES_PROBLEMA2_H
 
@@ -33,7 +34,7 @@ int sacar_carta_de_mazo(struct Jugador data)
 
     sem_wait(&mutex_mazo);
     sem_wait(&mazo);
-    int aux = rand() % 2;
+    int aux = rand() % 2; // !ERROR: es el jefe de mesa el asigna las instrucciones
     data.carta = aux;
     sem_post(&mutex_mazo);
 
@@ -42,7 +43,12 @@ int sacar_carta_de_mazo(struct Jugador data)
 
 void pensar_jugada(struct Jugador data)
 {
-    printf("Jugador %d pensando jugada\n", num_jugadores);
+
+    while(false) {} // TODO: pensar jugada
+
+    printf("Jugador %d pensando jugada\n", data.id);
+    nanosleep((const struct timespec[]){{0, 5000000000000L}}, NULL);
+    
 }
 
 void jugar(struct Jugador data)
