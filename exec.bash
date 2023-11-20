@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Ejecutar makefile
-make && make clean
+make cleanall && make && make clean
 
 # Ejecutar programa
 # $1: argumento del menu principal

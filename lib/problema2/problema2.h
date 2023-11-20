@@ -34,16 +34,33 @@ void *jefeMesa(void *arg);
 // *** Variables globales ***
 
 // semaforo
-sem_t mazo, reordenando, jugadores;
-sem_t mutex_mazo, mutex_jugadores, mutex_jefe;
+sem_t mazo;
+sem_t reordenando;
+sem_t jugadores;
+sem_t mutex_mazo;
+sem_t mutex_jugadores;
+sem_t mutex_jefe;
+
+// mutex auxiliares
+
+sem_t sem_x;
 
 // contador jugadores
 int num_jugadores = 0;
+
+int esperando = 0;
+
+int jugando = 0;
+
+int cartas[10];
+
 /**
  * 0: carta para esperar
  * 1: carta para jugar
  */
 int carta_actual = 0;
+
+int cartas_disponibles = MAX_CARTAS;
 
 bool reordenado = false;
 bool jefe_esperando = false;
@@ -59,16 +76,23 @@ bool jefe_esperando = false;
 void iniciarProblema2(int jugadores)
 {
 
+    printf("jugadores: %d\n", jugadores);
+
     if (jugadores < 1)
     {
         printf("El numero de jugadores debe ser mayor a 0\n");
         exit(-1);
     }
 
+    num_jugadores = jugadores;
     pthread_t *jugadores_t = malloc(sizeof(pthread_t) * jugadores);
     pthread_t jefe_t;
-    sem_init(&mazo, 0, 10);
+    sem_init(&mazo, 0, 0);
     sem_init(&reordenando, 0, 0);
+    sem_init(&mutex_jefe, 0, 0);
+
+    // inicializar mutex axiliares
+    sem_init(&sem_x, 0, 1);
 
     for (long i = 0; i < jugadores; i++)
     {
@@ -78,54 +102,38 @@ void iniciarProblema2(int jugadores)
         data->jugadas = 0;
         data->cartas_jugar = 0;
         data->cartas_esperar = 0;
+        cartas_disponibles = MAX_CARTAS;
         if (0 != pthread_create(&jugadores_t[i], NULL, jugador, (void *)data))
         {
             printf("Error al crear el hilo del jugador %ld\n", i);
             exit(-1);
         }
-        pthread_join(jugadores_t[i], NULL);
+        // pthread_join(jugadores_t[i], NULL);
     }
-
-    if (0 != pthread_create(&jefe_t, NULL, jefeMesa, NULL))
-    {
-        printf("Error al crear el hilo maestro\n");
-        exit(-1);
-    }
-    pthread_join(jefe_t, NULL);
 }
 
 void *jugador(void *arg)
 {
 
     Jugador *data = (struct Jugador *)arg;
-    sem_t aux_mutex;
-
-    sem_init(&aux_mutex, 0, 1);
+    printf("Jugador %ld creado\n", data->id);
 
     while (true)
     {
-
-
-
         pensar_jugada(*data);
 
-        sem_wait(&aux_mutex);
-        num_jugadores++;
-        if (num_jugadores == 1) sem_wait(&mutex_jefe);
-        sem_post(&aux_mutex);
-
         tomar_carta(*data);
-    
+
         if (data->carta == CARTA_ESPERAR)
         {
-            num_jugadores--;
-            if (num_jugadores == 0) sem_post(&mutex_jefe);
-            while (!reordenado)
+            esperando++;
+            if (esperando == num_jugadores)
             {
-                printf("Jugador %ld esperando reordenamiento\n", data->id);
+                sem_post(&mutex_jefe);
             }
         }
 
+        
         jugar(*data);
     }
 
@@ -137,11 +145,17 @@ void *jefeMesa(void *arg)
 
     while (true)
     {
-        sem_wait(&mutex_jefe);
-        reordenar();
-        reordenado = true;
-        sem_post(&reordenando);
-        sem_post(&mutex_jefe);
+
+        pensar_reordenamiento();
+
+        printf("Jefe de mesa esperando\n");
+
+        // mutex para reordenar
+        sem_wait(&mutex_mazo);
+
+        reordenar_tablero();
+
+        sem_post(&mutex_mazo);
     }
 
     pthread_exit(NULL);

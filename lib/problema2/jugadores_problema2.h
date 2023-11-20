@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <semaphore.h>
 #include <time.h>
+#include <stdbool.h>
 
 #ifndef JUGADORES_PROBLEMA2_H
 
@@ -17,25 +18,29 @@ typedef Jugador;
 extern sem_t mazo, reordenando, mutex_mazo;
 extern int num_jugadores;
 
-extern jefe_esperando;
+extern cartas_disponibles;
+
+extern bool jefe_esperando;
 
 void pensar_jugada();
-int sacar_carta_de_mazo();
+int tomar_carta();
 void jugar();
-
-
-
 
 /**
  * @brief retorna un numero aleatorio entre 0 y 1
-*/
-int sacar_carta_de_mazo(struct Jugador data)
+ */
+int tomar_carta(struct Jugador data)
 {
 
-    sem_wait(&mutex_mazo);
     sem_wait(&mazo);
-    int aux = rand() % 2; // !ERROR: es el jefe de mesa el asigna las instrucciones
+    sem_wait(&mutex_mazo);
+    int aux = rand() % 2; // TODO: tomar carta del arreglo de cartas
     data.carta = aux;
+    cartas_disponibles--;
+    if (cartas_disponibles == 0)
+    {
+        sem_post(&mutex_jefe);
+    }
     sem_post(&mutex_mazo);
 
     return aux;
@@ -43,18 +48,22 @@ int sacar_carta_de_mazo(struct Jugador data)
 
 void pensar_jugada(struct Jugador data)
 {
-
-    while(false) {} // TODO: pensar jugada
-
-    printf("Jugador %d pensando jugada\n", data.id);
-    nanosleep((const struct timespec[]){{0, 5000000000000L}}, NULL);
-    
+    printf("Jugador %ld pensando jugada\n", data.id);
+    esperando--;
+    wait(&reordenando);
 }
 
 void jugar(struct Jugador data)
 {
-    
 
+    if (data.carta == CARTA_ESPERAR)
+    {
+        printf("Jugador %ld esperando\n", data.id);
+    }
+    else
+    {
+        printf("Jugador %ld jugando\n", data.id);
+    }
 }
 
 #endif // JUGADORES_PROBLEMA2_H
