@@ -17,7 +17,7 @@ typedef Jugador;
 // variables externas
 extern sem_t mazo, reordenando, mutex_mazo;
 extern int num_jugadores;
-
+extern int cartas[10];
 extern cartas_disponibles;
 
 extern bool jefe_esperando;
@@ -32,9 +32,13 @@ void jugar();
 int tomar_carta(struct Jugador data)
 {
 
+    printf("Jugador %ld tomando carta\n", data.id);
     sem_wait(&mazo);
+    
     sem_wait(&mutex_mazo);
-    int aux = rand() % 2; // TODO: tomar carta del arreglo de cartas
+    printf("Jugador %ld tomando carta del mazo\n", data.id);
+    // int aux = rand() % 2; // TODO: tomar carta del arreglo de cartas
+    int aux = cartas[cartas_disponibles - 1];
     data.carta = aux;
     cartas_disponibles--;
     if (cartas_disponibles == 0)
@@ -49,8 +53,9 @@ int tomar_carta(struct Jugador data)
 void pensar_jugada(struct Jugador data)
 {
     printf("Jugador %ld pensando jugada\n", data.id);
+    esperando++;
+    while (!reordenado) {}
     esperando--;
-    wait(&reordenando);
 }
 
 void jugar(struct Jugador data)

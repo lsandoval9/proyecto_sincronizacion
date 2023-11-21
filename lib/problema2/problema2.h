@@ -62,9 +62,10 @@ int carta_actual = 0;
 
 int cartas_disponibles = MAX_CARTAS;
 
-bool reordenado = false;
+bool reordenado = true;
 bool jefe_esperando = false;
 
+bool empezar_jugadores = false;
 /**
  * archivos de cabecera. Se coloca aqui para evitar errores de compilacion
  * debido a que las variables globales deben ser declaradas antes de ser usadas en los archivos de cabecera
@@ -87,9 +88,10 @@ void iniciarProblema2(int jugadores)
     num_jugadores = jugadores;
     pthread_t *jugadores_t = malloc(sizeof(pthread_t) * jugadores);
     pthread_t jefe_t;
-    sem_init(&mazo, 0, 0);
+    sem_init(&mazo, 0, 10);
     sem_init(&reordenando, 0, 0);
     sem_init(&mutex_jefe, 0, 0);
+    sem_init(&mutex_mazo, 0, 1);
 
     // inicializar mutex axiliares
     sem_init(&sem_x, 0, 1);
@@ -98,7 +100,6 @@ void iniciarProblema2(int jugadores)
     {
         Jugador *data = malloc(sizeof(Jugador));
         data->id = i;
-        printf("Creando jugador %ld\n", i);
         data->jugadas = 0;
         data->cartas_jugar = 0;
         data->cartas_esperar = 0;
@@ -108,15 +109,34 @@ void iniciarProblema2(int jugadores)
             printf("Error al crear el hilo del jugador %ld\n", i);
             exit(-1);
         }
-        // pthread_join(jugadores_t[i], NULL);
     }
+
+    void *status_jefe;
+    if (0 != pthread_create(&jefe_t, NULL, jefeMesa, NULL))
+    {
+        printf("Error al crear el hilo del jefe de mesa\n");
+        exit(-1);
+    }
+
+    empezar_jugadores = true;
+
+    sleep(1);
+
+    printf("FIN\n");
 }
 
 void *jugador(void *arg)
 {
 
+    while (!empezar_jugadores)
+    {
+        printf("esperando\n");
+    }
+
     Jugador *data = (struct Jugador *)arg;
-    printf("Jugador %ld creado\n", data->id);
+
+    printf("Jugador %ld esperando\n", data->id);
+    return;
 
     while (true)
     {
@@ -133,7 +153,6 @@ void *jugador(void *arg)
             }
         }
 
-        
         jugar(*data);
     }
 
@@ -146,16 +165,11 @@ void *jefeMesa(void *arg)
     while (true)
     {
 
+        printf("en false\n");
+
         pensar_reordenamiento();
 
-        printf("Jefe de mesa esperando\n");
-
-        // mutex para reordenar
-        sem_wait(&mutex_mazo);
-
         reordenar_tablero();
-
-        sem_post(&mutex_mazo);
     }
 
     pthread_exit(NULL);

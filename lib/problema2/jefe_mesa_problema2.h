@@ -26,28 +26,22 @@ void colocar_carta_en_mazo(int carta, int i);
 
 void reordenar_tablero()
 {
-    jefe_esperando = true;
-
-    // TODO
+    sem_wait(&mutex_mazo);
     for (int i = 0; i < MAX_CARTAS; i++)
     {
         int carta = elegir_proxima_carta();
         colocar_carta_en_mazo(carta, i);
     }
-
-    for (int i = 0; i < esperando; i++)
-    {
-        sem_post(&reordenando);
-    }
+    
+    reordenado = true;
+    printf("El jefe de mesa ha terminado de reordenar el tablero\n");
+    sem_post(&mutex_mazo);
 }
 
 void pensar_reordenamiento()
 {
-
-    // !el Jefe piensa los cambios mientras hayan jugadores no en espera o cartas en el mazo
-    sem_wait(&mutex_jefe);
     printf("Jefe de mesa pensando reordenamiento\n");
-
+    sem_wait(&mutex_jefe);
     printf("El jefe de mesa ha terminado de pensar el reordenamiento\n");
 }
 
@@ -58,7 +52,6 @@ int elegir_proxima_carta()
 
 void colocar_carta_en_mazo(int carta, int i)
 {
-
     cartas[i] = carta;
     sem_post(&mazo);
     cartas_disponibles++;
