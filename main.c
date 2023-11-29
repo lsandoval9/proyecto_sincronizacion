@@ -12,6 +12,7 @@
 #include <pthread.h>
 
 #include "lib/problema2/problema2.h"
+#include "lib/utilities/file_utility.h"
 
 int main(int argc, char const *argv[])
 {
@@ -35,11 +36,10 @@ int main(int argc, char const *argv[])
     switch (input)
     {
     case 0:
-        printf("No se ingreso argumento\n");
-        iniciarProblema2(20);
+        iniciarProblema2();
         break;
     case 1:
-        printf("Se ingreso argumento 1\n");
+        // iniciarProblema1();
         break;
     default:
         printf("Uso del programa: ./exec.bash [opcion:int1]\n");

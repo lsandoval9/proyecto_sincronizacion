@@ -5,20 +5,21 @@
 #include <time.h>
 #include <stdbool.h>
 
+#include "../config/problema2_config.h"
+
 #ifndef JUGADORES_PROBLEMA2_H
 
 #define JUGADORES_PROBLEMA2_H
-#define CARTA_ESPERAR 0
-#define CARTA_JUGAR 1
+
 
 // external typedef
-typedef Jugador;
+typedef struct Jugador Jugador;
 
 // variables externas
 extern sem_t mazo, reordenando, mutex_mazo;
 extern int num_jugadores;
-extern int cartas[10];
-extern cartas_disponibles;
+extern int cartas[MAX_CARTAS];
+extern int cartas_disponibles;
 
 extern bool jefe_esperando;
 

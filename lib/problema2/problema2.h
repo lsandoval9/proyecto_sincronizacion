@@ -6,6 +6,9 @@
 #include <semaphore.h>
 #include <stdbool.h>
 
+#include "../config/problema2_config.h"
+#include "../utilities/file_utility.h"
+
 #ifndef PROBLEMA2_H
 
 // Definir constante de proteccion
@@ -28,8 +31,12 @@ typedef struct Jugador
 } Jugador;
 
 // prototipos de funciones
-void *jugador(void *arg);
-void *jefeMesa(void *arg);
+/**
+ * @brief funcion que representa la ejecucion de un jugador
+ * @param data estructura que contiene la informacion del jugador
+*/
+void *jugador(void *data);
+void *jefeMesa(void *data);
 
 // *** Variables globales ***
 
@@ -66,6 +73,11 @@ bool reordenado = true;
 bool jefe_esperando = false;
 
 bool empezar_jugadores = false;
+
+// mutext
+pthread_mutex_t mutex_esperando = PTHREAD_MUTEX_INITIALIZER;
+
+
 /**
  * archivos de cabecera. Se coloca aqui para evitar errores de compilacion
  * debido a que las variables globales deben ser declaradas antes de ser usadas en los archivos de cabecera
@@ -74,19 +86,14 @@ bool empezar_jugadores = false;
 #include "jefe_mesa_problema2.h"
 
 // Funcion principal
-void iniciarProblema2(int jugadores)
+void iniciarProblema2()
 {
 
-    printf("jugadores: %d\n", jugadores);
+    appendToFile(FILENAME_PROBLEMA2, "Iniciando problema 2");
 
-    if (jugadores < 1)
-    {
-        printf("El numero de jugadores debe ser mayor a 0\n");
-        exit(-1);
-    }
 
-    num_jugadores = jugadores;
-    pthread_t *jugadores_t = malloc(sizeof(pthread_t) * jugadores);
+    num_jugadores = NUM_JUGADORES;
+    pthread_t *jugadores_t = malloc(sizeof(pthread_t) * NUM_JUGADORES);
     pthread_t jefe_t;
     sem_init(&mazo, 0, 10);
     sem_init(&reordenando, 0, 0);
@@ -96,7 +103,7 @@ void iniciarProblema2(int jugadores)
     // inicializar mutex axiliares
     sem_init(&sem_x, 0, 1);
 
-    for (long i = 0; i < jugadores; i++)
+    for (long i = 0; i < NUM_JUGADORES; i++)
     {
         Jugador *data = malloc(sizeof(Jugador));
         data->id = i;
@@ -118,25 +125,27 @@ void iniciarProblema2(int jugadores)
         exit(-1);
     }
 
+
     empezar_jugadores = true;
 
-    sleep(1);
+    while(true) {}
 
-    printf("FIN\n");
 }
 
-void *jugador(void *arg)
+
+void *jugador(void *args)
 {
 
-    while (!empezar_jugadores)
-    {
-        printf("esperando\n");
-    }
+    
+    while (!empezar_jugadores) {}
 
-    Jugador *data = (struct Jugador *)arg;
+    appendToFile(FILENAME_PROBLEMA2, "Iniciando jugador");
 
-    printf("Jugador %ld esperando\n", data->id);
-    return;
+    Jugador *data = (struct Jugador *) args;
+
+    char jugadorStr[50];
+    sprintf(jugadorStr, "Jugador %ld", data->id);
+    appendToFile(FILENAME_PROBLEMA2, jugadorStr);
 
     while (true)
     {
@@ -146,7 +155,10 @@ void *jugador(void *arg)
 
         if (data->carta == CARTA_ESPERAR)
         {
+            
+            pthread_mutex_lock(&mutex_esperando);
             esperando++;
+            pthread_mutex_unlock(&mutex_esperando);
             if (esperando == num_jugadores)
             {
                 sem_post(&mutex_jefe);
@@ -157,15 +169,16 @@ void *jugador(void *arg)
     }
 
     pthread_exit(NULL);
+    return;
 }
 
 void *jefeMesa(void *arg)
 {
+    
+    while (!empezar_jugadores) {}
 
     while (true)
     {
-
-        printf("en false\n");
 
         pensar_reordenamiento();
 
