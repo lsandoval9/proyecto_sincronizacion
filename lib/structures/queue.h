@@ -36,7 +36,7 @@ void encolar(struct cola *cola, int valor)
 {
   struct nodo *nuevo_nodo = malloc(sizeof(struct nodo));
   nuevo_nodo-> codigo_operacion = valor;
-  strcpy(nuevo_nodo->registro_operacion, obtener_fecha_hora()); 
+  strcpy(nuevo_nodo->registro_operacion, get_time()); 
   nuevo_nodo->siguiente = NULL;
 
 	  if (cola->inicio == NULL) 
@@ -64,7 +64,7 @@ void encolar_proceso(struct cola *c, int valor)
 			if(valor = 0) // si la nueva opración es administración, se solapa 
 			{
 				c->fin->codigo_operacion *= -1;
-				strcpy(c->fin->registro_operacion_admin, obtener_fecha_hora()); 
+				strcpy(c->fin->registro_operacion_admin, get_time()); 
 			}
 			else // sino, significa que el nuevo valor a ingresar es lectura o escritura (no "solapable")
 			{

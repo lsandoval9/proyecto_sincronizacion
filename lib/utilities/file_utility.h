@@ -18,7 +18,7 @@
  * @param filename The name of the file to append to
  * @param content The content to append to the file
  */
-void appendToFile(const char* filename, const char* content) {
+void append_to_file(const char* filename, const char* content) {
     // Construct the file path
     char filepath[256];
     snprintf(filepath, sizeof(filepath), "./out/%s", filename);

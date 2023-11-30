@@ -6,21 +6,12 @@
 #include<pthread.h>
 #include<semaphore.h>
 #include<time.h> 
-#define CANTIDAD_THREAD 40 // cantidad de procesos
-#define SIZEDATETIME 128 //CONSTANTE PARA LAS CADENAS DE LA FECHA Y HORA DEL PROCESO
-//variables y procedimientos snake_case!
 
-/*------ FUNCIÓN PARA HORA ACTUAL ------*/
+#include "../config/problema1_config.h"
 
-char* obtener_fecha_hora() 
-{
-	time_t tiempo = time(0); 
-	struct tm *tlocal = localtime(&tiempo); 
-	char *fecha_hora; 
-	strftime(fecha_hora, SIZEDATETIME, "%d/%m/%y (%H:%M:%S)", tlocal);
-	return fecha_hora; 
-}
+#ifndef _PROBLEMA1_H
 
+#define _PROBLEMA1_H
 
 
 /*------ PROCEDIMIENTOS PARA LOS PROCESOS ------*/
@@ -92,9 +83,9 @@ void *administrador(void *args)
 
 /*CODIGO PRINCIPAL*/
 
-int main()
-{
-	srand(time(NULL));
+void problema2() {
+
+    srand(time(NULL));
 	pthread_t hilo_L_E[CANTIDAD_THREAD];
 	int tipo_proceso; 
 		sem_init(&sem_cola_lectores, 0, 1);
@@ -132,5 +123,10 @@ int main()
 }
 
 
+
+
+
 //NOTA: FALTA UN CICLO PARA LOS DÍAS, Y SOLO FALTA FALTA LAS FUNCIONES PARA ESCRIBIR EN UN ARCHIVO DE TEXTO, LA ESTRUCTURA YA ESTÁ HECHA.
 // LA CANTIDAD DE PROCESOS SE CONFIGURAN POR CONSTANTE, EN UN RATO SUBO LA NUEVA VERSIÓN :v 
+
+#endif

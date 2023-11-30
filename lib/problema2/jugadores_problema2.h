@@ -77,7 +77,7 @@ void jugar(struct Jugador data)
     if (data.carta == CARTA_ESPERAR)
     {
         printf("Jugador %ld n_disponibles para jugar CARTA_ESPERA\n", data.id);
-        set_wait(&mutex_jugadores_esperando);
+        //sem_wait(&mutex_jugadores_esperando);
         printf("Jugador %ld termino de esperar para jugar CARTA_ESPERA\n", data.id);
         
         void esperar_reordenamiento();

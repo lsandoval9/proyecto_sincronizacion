@@ -96,7 +96,7 @@ pthread_mutex_t mutex_jugadores_esperando = PTHREAD_MUTEX_INITIALIZER;
 void iniciarProblema2()
 {
 
-    appendToFile(FILENAME_PROBLEMA2, "Iniciando problema 2");
+    append_to_file(FILENAME_PROBLEMA2, "Iniciando problema 2");
 
     num_jugadores = NUM_JUGADORES;
     pthread_t *jugadores_t = malloc(sizeof(pthread_t) * NUM_JUGADORES);
@@ -148,13 +148,13 @@ void *jugador(void *args)
     
     while (!empezar_jugadores) {}
 
-    appendToFile(FILENAME_PROBLEMA2, "Iniciando jugador");
+    append_to_file(FILENAME_PROBLEMA2, "Iniciando jugador");
 
     Jugador *data = (struct Jugador *) args;
 
     char jugadorStr[50];
     sprintf(jugadorStr, "Jugador %ld", data->id);
-    appendToFile(FILENAME_PROBLEMA2, jugadorStr);
+    append_to_file(FILENAME_PROBLEMA2, jugadorStr);
 
     while (true)
     {
