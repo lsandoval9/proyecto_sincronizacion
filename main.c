@@ -47,12 +47,10 @@ int main(int argc, char const *argv[])
 
     start_stopwatch(input);
 
-    while (1) {};
-
     switch (input)
     {
     case 0:
-        //iniciarProblema2();
+        iniciarProblema1();
         break;
     case 1:
         iniciarProblema2();
