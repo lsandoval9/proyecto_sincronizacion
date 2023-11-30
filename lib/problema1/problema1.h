@@ -6,12 +6,22 @@
 #include <pthread.h>
 #include <semaphore.h>
 #include <time.h>
+#include <stdbool.h>
 
 #include "../config/problema1_config.h"
+#include "../utilities/file_utility.h"
+#include "procesos_problema1.h"
 
 #ifndef PROBLEMA1_H
 
 #define PROBLEMA1_H
+
+
+typedef struct InfoProceso
+{
+    int id;
+    int tipo;
+} InfoProceso;
 
 /*------ PROCEDIMIENTOS PARA LOS PROCESOS ------*/
 
@@ -20,70 +30,14 @@ sem_t sem_contador_escritores, sem_escritor;
 int contador_lectores;
 int contador_escritores;
 int contador_administradores;
+bool inicializado = false;
 
-// procedimiento para procesos lectores
-void *lectores(void *args)
-{
-    sem_wait(&sem_cola_lectores);
-    sem_wait(&sem_lector);
-    sem_wait(&sem_contador_lectores);
-    contador_lectores++;
-    if (contador_lectores == 1)
-    {
-        sem_wait(&sem_escritor);
-    }
-    sem_post(&sem_contador_lectores);
-    sem_post(&sem_lector);
-    sem_post(&sem_cola_lectores);
-    printf("leyendo datos...\n");
-    sem_wait(&sem_contador_lectores);
-    contador_lectores--;
-    if (contador_lectores == 0)
-    {
-        sem_post(&sem_escritor);
-    }
-    sem_post(&sem_contador_lectores);
-}
 
-// procedimiento para procesos escritores
-
-void *escritores(void *args)
-{
-    sem_wait(&sem_contador_escritores);
-    contador_escritores++;
-    if (contador_escritores == 1)
-    {
-        sem_wait(&sem_lector);
-    }
-    sem_post(&sem_contador_escritores);
-    sem_wait(&sem_escritor);
-    printf("escribiendo...\n");
-    sem_post(&sem_escritor);
-    sem_wait(&sem_contador_escritores);
-    contador_escritores--;
-    if (contador_escritores == 0)
-    {
-        sem_post(&sem_lector);
-    }
-    sem_post(&sem_contador_escritores);
-}
-
-// proceso administrador
-
-void *administrador(void *args)
-{
-    sem_wait(&sem_lector);
-    sem_wait(&sem_escritor);
-    printf("administrando...\n");
-    sem_post(&sem_escritor);
-    sem_post(&sem_lector);
-}
 
 /*CODIGO PRINCIPAL*/
 
 void iniciarProblema1()
 {
-
     srand(time(NULL));
     pthread_t hilo_L_E[CANTIDAD_THREAD];
     int tipo_proceso;
@@ -114,14 +68,13 @@ void iniciarProblema1()
             contador_administradores++;
         }
     }
-    for (int i = 0; i < CANTIDAD_THREAD; i++)
-    {
-        pthread_join(hilo_L_E[i], NULL);
-    }
 
     printf("total procesos lectores: %d\n", contador_lectores);
     printf("total procesos escritores: %d\n", contador_escritores);
     printf("total procesos administradores: %d\n", contador_administradores);
+
+    inicializado = true;
+    while (true) {}
 }
 
 // NOTA: FALTA UN CICLO PARA LOS DÍAS, Y SOLO FALTA FALTA LAS FUNCIONES PARA ESCRIBIR EN UN ARCHIVO DE TEXTO, LA ESTRUCTURA YA ESTÁ HECHA.
