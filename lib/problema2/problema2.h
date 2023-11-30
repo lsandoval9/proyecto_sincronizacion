@@ -49,6 +49,8 @@ sem_t mutex_jefe;
 
 sem_t jugadores_disponibles;
 
+sem_t sem_jugadores;
+
 // contador jugadores
 int num_jugadores = 0;
 
@@ -66,16 +68,21 @@ int carta_actual = 0;
 
 int cartas_disponibles = MAX_CARTAS;
 
+int n_esperando = 0;
+
 bool reordenado = false;
 bool jefe_esperando = false;
 
 bool empezar_jugadores = false;
 
+bool reordenamiento_terminado = false;
+
 // mutext
 pthread_mutex_t mutex_esperando = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t mutex_jugadores = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutex_cartas_disponibles = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutex_reordenando = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t mutex_jugadores_disponibles = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t mutex_jugadores_esperando = PTHREAD_MUTEX_INITIALIZER;
 
 
 /**
@@ -99,8 +106,11 @@ void iniciarProblema2()
     sem_init(&mutex_jefe, 0, 0);
     sem_init(&mutex_mazo, 0, 1);
     sem_init(&jugadores_disponibles, 0, 0);
+    sem_init(&sem_jugadores, 0, NUM_JUGADORES);
 
     // inicializar mutex axiliares
+
+    pthread_mutex_lock(&mutex_jugadores_esperando);
 
     for (long i = 0; i < NUM_JUGADORES; i++)
     {
@@ -156,11 +166,12 @@ void *jugador(void *args)
 
         if (data->carta == CARTA_ESPERAR)
         {
-            sem_wait(&jugadores_disponibles);
-            sem_getvalue(&jugadores_disponibles, &n_disponibles);
-            printf("**************** El valor de esperando es %d ****************\n", n_disponibles);
+            pthread_mutex_lock(&mutex_jugadores_disponibles);
+            n_esperando++;
+            pthread_mutex_unlock(&mutex_jugadores_disponibles);
+            printf("**************** El valor de esperando es %d ****************\n", n_esperando);
             printf("**************** El valor de num_jugadores es %d ****************\n", num_jugadores);
-            if (n_disponibles == 0)
+            if (n_esperando == NUM_JUGADORES)
             {
                 printf("Ya no hay jugadores jugando\n");
                 sem_post(&mutex_jefe);
@@ -180,18 +191,15 @@ void *jefeMesa(void *arg)
 
     while (true)
     {
+        reordenamiento_terminado = false;
 
         pensar_reordenamiento();
-
-        reordenado = false;
 
         reordenar_tablero();
 
         printf("El jefe va a desbloquear los jugadores\n");
 
-        pthread_mutex_unlock(&mutex_jugadores);
-
-        reordenado = true;
+        reordenamiento_terminado = true;
     }
 
     pthread_exit(NULL);

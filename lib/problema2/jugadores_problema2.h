@@ -22,7 +22,8 @@ extern int cartas[MAX_CARTAS];
 extern int cartas_disponibles;
 
 extern bool jefe_esperando;
-extern pthread_mutex_t mutex_jugadores;
+extern bool reordenamiento_terminado;
+extern sem_t sem_jugadores;
 // mutex
 
 extern pthread_mutex_t mutex_cartas_disponibles;
@@ -32,6 +33,7 @@ extern sem_t mutex_jefe;
 void pensar_jugada();
 int tomar_carta(struct Jugador *data);
 void jugar();
+void esperar_reordenamiento();
 
 /**
  * @brief retorna un numero aleatorio entre 0 y 1
@@ -39,9 +41,7 @@ void jugar();
 int tomar_carta(struct Jugador *data)
 {
 
-    if (reordenado) {
-        pthread_mutex_lock(&mutex_reordenando);
-    }
+    void esperar_reordenamiento();
 
     sem_wait(&mazo);
     sem_wait(&mutex_mazo);
@@ -74,15 +74,15 @@ void pensar_jugada(struct Jugador data)
 void jugar(struct Jugador data)
 {
 
-    if (data.carta == CARTA_ESPERAR || ESTA_ESPERANDO)
+    if (data.carta == CARTA_ESPERAR)
     {
         printf("Jugador %ld n_disponibles para jugar CARTA_ESPERA\n", data.id);
-        pthread_mutex_lock(&mutex_jugadores);
+        set_wait(&mutex_jugadores_esperando);
         printf("Jugador %ld termino de esperar para jugar CARTA_ESPERA\n", data.id);
+        
+        void esperar_reordenamiento();
 
-        // TEMPORAL
-
-        // JEFE ******
+        /*
         bool es_ultimo = false;// inicia la variable
         while (algo) {
             
@@ -98,12 +98,17 @@ void jugar(struct Jugador data)
         // JUGADOR ******
         // salen todos a la vez
         while (!es_ultimo) {}
-
+        */
     }
     else
     {
         printf("Jugador %ld jugando\n", data.id);
     }
+}
+
+void esperar_reordenamiento() {
+
+    while (!reordenamiento_terminado) {}
 }
 
 #endif // JUGADORES_PROBLEMA2_H
