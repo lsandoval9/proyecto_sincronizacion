@@ -26,7 +26,7 @@ void* stopwatch_thread(void* arg) {
             break;
     }
     while (1) {
-        nanosleep((const struct timespec[]){{0, 100000000L}}, NULL); // Sleep for 0.1 seconds
+        nanosleep((const struct timespec[]){{0, 500000000L}}, NULL); // Sleep for 0.1 seconds
         print_time(file_name); // Call the print_time function
     }
 }
