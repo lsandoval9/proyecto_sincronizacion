@@ -1,8 +1,8 @@
 # Definir las variables
 CC = gcc # El compilador a usar
-CFLAGS = -Wall -g -pthread -lpthread -lrt -std=c99 # Las opciones de compilación
+CFLAGS = -Wall -g -pthread -std=c99 # Las opciones de compilación
 LDFLAGS = -Llib # La ruta de las librerías externas
-LDLIBS = -lm # Las librerías a enlazar
+LDLIBS = -lm -lrt # Las librerías a enlazar
 TARGET = main.bin # El nombre del ejecutable
 OBJS = main.o # Los archivos objeto a generar
 

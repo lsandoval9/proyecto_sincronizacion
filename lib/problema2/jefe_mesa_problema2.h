@@ -19,6 +19,12 @@ extern int esperando;
 extern int jugando;
 extern int cartas_disponibles;
 
+// mutex
+
+extern pthread_mutex_t mutex_esperando;
+extern pthread_mutex_t mutex_cartas_disponibles;
+extern pthread_mutex_t mutex_reordenando;
+
 void pensar_reordenamiento();
 void reordenar_tablero();
 int elegir_proxima_carta();
@@ -33,9 +39,14 @@ void reordenar_tablero()
         colocar_carta_en_mazo(carta, i);
     }
     
-    reordenado = true;
     printf("El jefe de mesa ha terminado de reordenar el tablero\n");
     sem_post(&mutex_mazo);
+    pthread_mutex_lock(&mutex_esperando);
+    esperando = 0;
+    pthread_mutex_unlock(&mutex_esperando);
+    pthread_mutex_unlock(&mutex_reordenando);
+    printf("El jefe de mesa ha terminado de reordenar el tablero DESPUES MUTEX\n");
+    
 }
 
 void pensar_reordenamiento()
@@ -54,7 +65,9 @@ void colocar_carta_en_mazo(int carta, int i)
 {
     cartas[i] = carta;
     sem_post(&mazo);
+    pthread_mutex_lock(&mutex_cartas_disponibles);
     cartas_disponibles++;
+    pthread_mutex_unlock(&mutex_cartas_disponibles);
 }
 
 #endif // JEFE_MESA_PROBLEMA2_H
