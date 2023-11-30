@@ -27,6 +27,7 @@ extern pthread_mutex_t mutex_jugadores;
 
 extern pthread_mutex_t mutex_cartas_disponibles;
 extern pthread_mutex_t mutex_reordenando;
+extern sem_t mutex_jefe;
 
 void pensar_jugada();
 int tomar_carta(struct Jugador *data);
@@ -44,9 +45,10 @@ int tomar_carta(struct Jugador *data)
 
     sem_wait(&mazo);
     sem_wait(&mutex_mazo);
-    printf("Jugador %ld tomando carta del mazo\n", data->id);
     int aux = cartas[cartas_disponibles - 1];
-    data->carta = 0;
+    data->carta = aux;
+    printf("Jugador %ld tomo carta %d\n", data->id, aux);
+    printf("Cartas disponibles: %d\n", cartas_disponibles);
     pthread_mutex_lock(&mutex_cartas_disponibles);
     cartas_disponibles--;
     pthread_mutex_unlock(&mutex_cartas_disponibles);
@@ -64,7 +66,7 @@ void pensar_jugada(struct Jugador data)
 {
     printf("Jugador %ld pensando jugada\n", data.id);
     if (reordenado) {
-        printf("Jugador %ld reordenando\n", data.id);
+        printf("Jugador %ld en espera reordenamiento\n", data.id);
         pthread_mutex_lock(&mutex_reordenando);
     }
 }
@@ -72,10 +74,31 @@ void pensar_jugada(struct Jugador data)
 void jugar(struct Jugador data)
 {
 
-    if (data.carta == CARTA_ESPERAR)
+    if (data.carta == CARTA_ESPERAR || ESTA_ESPERANDO)
     {
-        printf("Jugador %ld esperando\n", data.id);
+        printf("Jugador %ld n_disponibles para jugar CARTA_ESPERA\n", data.id);
         pthread_mutex_lock(&mutex_jugadores);
+        printf("Jugador %ld termino de esperar para jugar CARTA_ESPERA\n", data.id);
+
+        // TEMPORAL
+
+        // JEFE ******
+        bool es_ultimo = false;// inicia la variable
+        while (algo) {
+            
+            post(semaforo);//aqui agarra y va dando permisos a los jugadores q estaban en espera
+            sem_getvalue(&semaforo, &actual); // obtiene el valor actual y lo guarda en actual
+            //si el jactual es el ultimo, entonces significa que termino de or ldarle permiso a los jal jultimo jugador para jque jueguee
+            if (actual = ultimo) //cambia la bandera y sale del whileo) {
+                es_ultimo = true;
+            }
+        }
+        // JEFE ******
+        
+        // JUGADOR ******
+        // salen todos a la vez
+        while (!es_ultimo) {}
+
     }
     else
     {

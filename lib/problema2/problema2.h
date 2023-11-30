@@ -47,10 +47,12 @@ sem_t jugadores;
 sem_t mutex_mazo;
 sem_t mutex_jefe;
 
+sem_t jugadores_disponibles;
+
 // contador jugadores
 int num_jugadores = 0;
 
-int esperando = 0;
+int n_disponibles;
 
 int jugando = 0;
 
@@ -64,7 +66,7 @@ int carta_actual = 0;
 
 int cartas_disponibles = MAX_CARTAS;
 
-bool reordenado = true;
+bool reordenado = false;
 bool jefe_esperando = false;
 
 bool empezar_jugadores = false;
@@ -92,10 +94,11 @@ void iniciarProblema2()
     num_jugadores = NUM_JUGADORES;
     pthread_t *jugadores_t = malloc(sizeof(pthread_t) * NUM_JUGADORES);
     pthread_t jefe_t;
-    sem_init(&mazo, 0, 10);
+    sem_init(&mazo, 0, MAX_CARTAS);
     sem_init(&reordenando, 0, 0);
     sem_init(&mutex_jefe, 0, 0);
     sem_init(&mutex_mazo, 0, 1);
+    sem_init(&jugadores_disponibles, 0, 0);
 
     // inicializar mutex axiliares
 
@@ -153,13 +156,11 @@ void *jugador(void *args)
 
         if (data->carta == CARTA_ESPERAR)
         {
-            printf("El jugador %ld esta esperandoAAA\n", data->id);
-            pthread_mutex_lock(&mutex_esperando);
-            esperando++;
-            pthread_mutex_unlock(&mutex_esperando);
-            printf("El jugador %ld esta esperandoBBB\n", data->id);
-            printf("El valor de esperando es %d\n", esperando);
-            if (esperando == num_jugadores)
+            sem_wait(&jugadores_disponibles);
+            sem_getvalue(&jugadores_disponibles, &n_disponibles);
+            printf("**************** El valor de esperando es %d ****************\n", n_disponibles);
+            printf("**************** El valor de num_jugadores es %d ****************\n", num_jugadores);
+            if (n_disponibles == 0)
             {
                 printf("Ya no hay jugadores jugando\n");
                 sem_post(&mutex_jefe);
