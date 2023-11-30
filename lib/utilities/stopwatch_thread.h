@@ -13,8 +13,9 @@
 
 #define INTERVAL 1 // Interval in seconds
 
+
 void* stopwatch_thread(void* arg) {
-    int selected = *(int*)arg;
+    int selected = *((int *)arg);
     char* file_name;
     switch(selected) {
         case 0:
@@ -31,8 +32,15 @@ void* stopwatch_thread(void* arg) {
 }
 
 void start_stopwatch(int input) {
+     int *aux = malloc(sizeof(int)); // Allocate memory for the input value
+    if (aux == NULL) {
+        printf("Memory allocation failed\n");
+        return;
+    }
+    *aux = input;
+    printf("Input: %d\n", input);
     pthread_t thread;
-    pthread_create(&thread, NULL, stopwatch_thread, &input); // Create a thread and pass N as an argument
+    pthread_create(&thread, NULL, stopwatch_thread, aux); // Pass the address of aux as the argument
 }
 
 
