@@ -46,6 +46,7 @@ int main(int argc, char const *argv[])
     }
 
     // start_stopwatch(input);
+    input =1;
 
     switch (input)
     {
