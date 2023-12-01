@@ -54,7 +54,8 @@ void *lector(void *arg)
     {                    
         
         sleep_thread(PROBLEMA1_WAIT_TIME);
-                            
+        
+        printf("Lector esperando a que no haya administradores ni escritores\n");
         sem_wait(&sem_administracion);       
         pthread_mutex_lock(&mutex_lectores); // Bloquear el mutex de lectores
         lectores++;                          // Incrementar el contador de lectores
@@ -94,7 +95,7 @@ void *escritor(void *arg)
         
         sleep_thread(PROBLEMA1_WAIT_TIME);
                                  // Repetir indefinidamente
-                                 printf("Escritor esperando a que no haya administradores\n");
+                                 printf("Escritor esperando a que no haya administradores ni lectores\n");
         sem_wait(&sem_administracion);         // Esperar a que no haya administradores
         pthread_mutex_lock(&mutex_escritores); // Bloquear el mutex de escritores
         escritores++;                          // Incrementar el contador de escritores

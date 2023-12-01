@@ -15,6 +15,17 @@
 // external typedef
 typedef struct Jugador Jugador;
 
+// estadisticas del jugador
+extern struct EstadisticasPartida estadisticas;
+
+// mutex estadisticas
+extern pthread_mutex_t mutex_cartas_jugar_total;
+extern pthread_mutex_t mutex_cartas_esperar_total;
+
+// mutex jugadores
+extern pthread_mutex_t mutex_cartas_jugar;
+extern pthread_mutex_t mutex_cartas_esperar;
+
 // variables externas
 extern sem_t mazo, reordenando, mutex_mazo;
 extern int num_jugadores;
@@ -72,13 +83,13 @@ int tomar_carta(struct Jugador *data)
     return aux;
 }
 
-void pensar_jugada(struct Jugador data)
+void pensar_jugada(struct Jugador *data)
 {
-    printf("Jugador %ld pensando jugada\n", data.id);
+    printf("Jugador %ld pensando jugada\n", data->id);
 
 
     if (reordena) {
-        printf("Jugador %ld en espera reordenamiento\n", data.id);
+        printf("Jugador %ld en espera reordenamiento\n", data->id);
 
         //cambios aqui
         pthread_mutex_lock(&mutex_jugadores_disponibles);
@@ -89,15 +100,23 @@ void pensar_jugada(struct Jugador data)
     }
 }
 
-void jugar(struct Jugador data)
+void jugar(struct Jugador *data)
 {
 
-    if (data.carta == CARTA_ESPERAR)
+    if (data->carta == CARTA_ESPERAR)
     {
-        printf("Jugador %ld procede a esperar reordenamiento debido a su CARTA_ESPERA\n", data.id);
+        printf("Jugador %ld procede a esperar reordenamiento debido a su CARTA_ESPERA\n", data->id);
         sem_wait(&sem_jugadores);
-        printf("Jugador %ld termino de esperar para jugar CARTA_ESPERA\n", data.id);
+        printf("Jugador %ld termino de esperar para jugar CARTA_ESPERA\n", data->id);
         
+
+        data->cartas_esperar++;
+        printf("Jugador %ld tiene %d cartas esperar\n", data->id, data->cartas_esperar);
+
+        pthread_mutex_lock(&mutex_cartas_esperar);
+        estadisticas.cartas_esperar_total += 1;
+        printf("Hay %d cartas esperar en total\n", estadisticas.cartas_esperar_total);
+        pthread_mutex_unlock(&mutex_cartas_esperar);
 
         /*
         bool es_ultimo = false;// inicia la variable
@@ -119,7 +138,18 @@ void jugar(struct Jugador data)
     }
     else
     {
-        printf("Jugador %ld jugando\n", data.id);
+        printf("Jugador %ld jugando\n", data->id);
+
+        pthread_mutex_lock(&mutex_cartas_jugar);
+        data->cartas_jugar++;
+        pthread_mutex_unlock(&mutex_cartas_jugar);
+        printf("Jugador %ld tiene %d cartas jugar\n", data->id, data->cartas_jugar);
+
+        pthread_mutex_lock(&mutex_cartas_jugar);
+        estadisticas.cartas_jugar_total++;
+        printf("Hay %d cartas jugar en total\n", estadisticas.cartas_jugar_total);
+        pthread_mutex_unlock(&mutex_cartas_jugar);
+
     }
 }
 
