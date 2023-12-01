@@ -14,16 +14,6 @@
 
 // external typedef
 typedef struct Jugador Jugador;
-extern struct EstadisticasPartida estadisticas;
-
-// Mutex estadisticas
-extern pthread_mutex_t mutex_cartas_jugar_total;
-extern pthread_mutex_t mutex_cartas_esperar_total;
-
-// mutex estadisticas del jugador
-extern pthread_mutex_t mutex_cartas_jugar;
-extern pthread_mutex_t mutex_cartas_esperar;
-
 
 // variables externas
 extern sem_t mazo, reordenando, mutex_mazo;
@@ -107,14 +97,7 @@ void jugar(struct Jugador data)
         printf("Jugador %ld procede a esperar reordenamiento debido a su CARTA_ESPERA\n", data.id);
         sem_wait(&sem_jugadores);
         printf("Jugador %ld termino de esperar para jugar CARTA_ESPERA\n", data.id);
-
-        data.cartas_esperar++;
-        printf("El jugador %ld ha sacado %d cartas esperar en total\n", data.id, data.cartas_esperar);
         
-        pthread_mutex_lock(&mutex_cartas_esperar_total);
-        estadisticas.cartas_esperar_total++;
-        printf("Cartas esperar total: %d\n", estadisticas.cartas_esperar_total);
-        pthread_mutex_unlock(&mutex_cartas_esperar_total);
 
         /*
         bool es_ultimo = false;// inicia la variable
@@ -137,14 +120,6 @@ void jugar(struct Jugador data)
     else
     {
         printf("Jugador %ld jugando\n", data.id);
-
-        data.cartas_jugar++;
-        printf("El jugador %ld ha sacado %d cartas jugar en total\n", data.id, data.cartas_jugar);
-
-        pthread_mutex_lock(&mutex_cartas_jugar_total);
-        estadisticas.cartas_jugar_total++;
-        printf("Cartas jugar total: %d\n", estadisticas.cartas_jugar_total);
-        pthread_mutex_unlock(&mutex_cartas_jugar_total);
     }
 }
 
