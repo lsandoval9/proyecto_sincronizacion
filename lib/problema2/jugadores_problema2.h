@@ -15,15 +15,30 @@
 // external typedef
 typedef struct Jugador Jugador;
 
+// estadisticas del jugador
+extern struct EstadisticasPartida estadisticas;
+
+// mutex estadisticas
+extern pthread_mutex_t mutex_cartas_jugar_total;
+extern pthread_mutex_t mutex_cartas_esperar_total;
+
+// mutex jugadores
+extern pthread_mutex_t mutex_cartas_jugar;
+extern pthread_mutex_t mutex_cartas_esperar;
+
 // variables externas
 extern sem_t mazo, reordenando, mutex_mazo;
 extern int num_jugadores;
 extern int cartas[MAX_CARTAS];
 extern int cartas_disponibles;
+extern int n_esperando;
 
 extern bool jefe_esperando;
+extern bool reordena;
 extern bool reordenamiento_terminado;
 extern sem_t sem_jugadores;
+
+extern int sem_jugadores_value;
 // mutex
 
 extern pthread_mutex_t mutex_cartas_disponibles;
@@ -41,14 +56,25 @@ void esperar_reordenamiento();
 int tomar_carta(struct Jugador *data)
 {
 
-    void esperar_reordenamiento();
+    if (reordena) {
+
+        //cambios aqui
+        pthread_mutex_lock(&mutex_jugadores_disponibles);
+        n_esperando++;
+        printf("se esta reordenando en tomar carta %i jugadoresssssssssssssssssssssssssssss\n",n_esperando);
+        pthread_mutex_unlock(&mutex_jugadores_disponibles);
+
+        sem_wait(&sem_jugadores);
+
+
+    }
 
     sem_wait(&mazo);
     sem_wait(&mutex_mazo);
     int aux = cartas[cartas_disponibles - 1];
     data->carta = aux;
     printf("Jugador %ld tomo carta %d\n", data->id, aux);
-    printf("Cartas disponibles: %d\n", cartas_disponibles);
+    printf("Cartas disponibles: %d\n", cartas_disponibles-1);
     pthread_mutex_lock(&mutex_cartas_disponibles);
     cartas_disponibles--;
     pthread_mutex_unlock(&mutex_cartas_disponibles);
@@ -59,28 +85,43 @@ int tomar_carta(struct Jugador *data)
     }
     sem_post(&mutex_mazo);
 
+    
+
     return aux;
 }
 
-void pensar_jugada(struct Jugador data)
+void pensar_jugada(struct Jugador *data)
 {
-    printf("Jugador %ld pensando jugada\n", data.id);
-    if (reordenado) {
-        printf("Jugador %ld en espera reordenamiento\n", data.id);
-        pthread_mutex_lock(&mutex_reordenando);
+    printf("Jugador %ld pensando jugada\n", data->id);
+
+
+    if (reordena) {
+        printf("Jugador %ld en espera reordenamiento\n", data->id);
+
+        //cambios aqui
+        pthread_mutex_lock(&mutex_jugadores_disponibles);
+        n_esperando++;
+        printf("se esta reordenando en pensar jugada %i jugadoresssssssssssssssssssssssssssss\n",n_esperando);
+        pthread_mutex_unlock(&mutex_jugadores_disponibles);
+
+        sem_wait(&sem_jugadores);
     }
 }
 
-void jugar(struct Jugador data)
+void jugar(struct Jugador *data)
 {
 
-    if (data.carta == CARTA_ESPERAR)
+    if (data->carta == CARTA_ESPERAR)
     {
-        printf("Jugador %ld n_disponibles para jugar CARTA_ESPERA\n", data.id);
-        //sem_wait(&mutex_jugadores_esperando);
-        printf("Jugador %ld termino de esperar para jugar CARTA_ESPERA\n", data.id);
+  
         
-        void esperar_reordenamiento();
+        data->cartas_esperar++;
+        printf("Jugador %ld tiene %d cartas esperar\n", data->id, data->cartas_esperar);
+
+        pthread_mutex_lock(&mutex_cartas_esperar);
+        estadisticas.cartas_esperar_total += 1;
+        printf("Hay %d cartas esperar en total\n", estadisticas.cartas_esperar_total);
+        pthread_mutex_unlock(&mutex_cartas_esperar);
 
         /*
         bool es_ultimo = false;// inicia la variable
@@ -102,13 +143,21 @@ void jugar(struct Jugador data)
     }
     else
     {
-        printf("Jugador %ld jugando\n", data.id);
+        printf("Jugador %ld jugando\n", data->id);
+
+        pthread_mutex_lock(&mutex_cartas_jugar);
+        data->cartas_jugar++;
+        pthread_mutex_unlock(&mutex_cartas_jugar);
+        printf("Jugador %ld tiene %d cartas jugar\n", data->id, data->cartas_jugar);
+
+        pthread_mutex_lock(&mutex_cartas_jugar);
+        estadisticas.cartas_jugar_total++;
+        printf("Hay %d cartas jugar en total\n", estadisticas.cartas_jugar_total);
+        pthread_mutex_unlock(&mutex_cartas_jugar);
+
     }
 }
 
-void esperar_reordenamiento() {
 
-    while (!reordenamiento_terminado) {}
-}
 
 #endif // JUGADORES_PROBLEMA2_H

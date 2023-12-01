@@ -39,7 +39,7 @@ void print_time(char* file_name)
     //printf("<<<<< Time: %ld seconds %ld milliseconds >>>>>\n", elapsed_seconds, elapsed_microseconds);
 
     char time[256];
-    snprintf(time, sizeof(time), "<Segundos: %ld | Millisegundos: %ld>", elapsed_seconds, elapsed_microseconds);
+    snprintf(time, sizeof(time), "< Segundos: %ld | Milisegundos: %ld >", elapsed_seconds, elapsed_microseconds);
 
     //append_to_file(file_name, time);
     printf("%s\n", time);

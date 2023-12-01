@@ -9,6 +9,8 @@
 #include "../config/problema2_config.h"
 #include "../utilities/file_utility.h"
 
+#include "../utilities/sleep_thread_utility.h"
+
 #ifndef PROBLEMA2_H
 
 // Definir constante de proteccion
@@ -30,11 +32,26 @@ typedef struct Jugador
 
 } Jugador;
 
+/**
+ * @brief estructura que representa las estadisticas de una partida
+ * @param reordenadas_total numero de veces que se ha reordenado el tablero
+ * @param cartas_jugar_total numero de cartas que se han jugado
+ * @param cartas_esperar_total numero de cartas que se han esperado
+ */
+typedef struct EstadisticasPartida
+{
+    int reordenadas_total;
+    int cartas_jugar_total;
+    int cartas_esperar_total;
+} EstadisticasPartida;
+
+
+
 // prototipos de funciones
 /**
  * @brief funcion que representa la ejecucion de un jugador
  * @param data estructura que contiene la informacion del jugador
-*/
+ */
 void *jugador(void *data);
 void *jefeMesa(void *data);
 
@@ -60,6 +77,9 @@ int jugando = 0;
 
 int cartas[10];
 
+// Estadisticas
+EstadisticasPartida estadisticas = {0, 0, 0};
+
 /**
  * 0: carta para esperar
  * 1: carta para jugar
@@ -70,7 +90,10 @@ int cartas_disponibles = MAX_CARTAS;
 
 int n_esperando = 0;
 
+int sem_jugadores_value;
+
 bool reordenado = false;
+bool reordena = false;
 bool jefe_esperando = false;
 
 bool empezar_jugadores = false;
@@ -84,6 +107,14 @@ pthread_mutex_t mutex_reordenando = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutex_jugadores_disponibles = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutex_jugadores_esperando = PTHREAD_MUTEX_INITIALIZER;
 
+// Mutex para estadisticas
+pthread_mutex_t mutex_reordenadas_total = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t mutex_cartas_jugar_total = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t mutex_cartas_esperar_total = PTHREAD_MUTEX_INITIALIZER;
+
+// mutex estadisticas del jugador
+pthread_mutex_t mutex_cartas_jugar = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t mutex_cartas_esperar = PTHREAD_MUTEX_INITIALIZER;
 
 /**
  * archivos de cabecera. Se coloca aqui para evitar errores de compilacion
@@ -99,18 +130,27 @@ void iniciarProblema2()
     append_to_file(FILENAME_PROBLEMA2, "Iniciando problema 2");
 
     num_jugadores = NUM_JUGADORES;
-    pthread_t *jugadores_t = malloc(sizeof(pthread_t) * NUM_JUGADORES);
+    pthread_t *jugadores_t = (pthread_t*) malloc(sizeof(pthread_t) * NUM_JUGADORES);
     pthread_t jefe_t;
     sem_init(&mazo, 0, MAX_CARTAS);
     sem_init(&reordenando, 0, 0);
     sem_init(&mutex_jefe, 0, 0);
     sem_init(&mutex_mazo, 0, 1);
     sem_init(&jugadores_disponibles, 0, 0);
-    sem_init(&sem_jugadores, 0, NUM_JUGADORES);
+    sem_init(&sem_jugadores, 0, 0);
+
+    sem_jugadores_value = (int*) malloc(sizeof(int));
 
     // inicializar mutex axiliares
 
     pthread_mutex_lock(&mutex_jugadores_esperando);
+    pthread_mutex_lock(&mutex_reordenando);
+
+    // Inicializar cartas
+    for (int i = 0; i < MAX_CARTAS; i++)
+    {
+        cartas[i] = rand() % 2;
+    }
 
     for (long i = 0; i < NUM_JUGADORES; i++)
     {
@@ -134,23 +174,21 @@ void iniciarProblema2()
         exit(-1);
     }
 
-
     empezar_jugadores = true;
 
     pthread_join(jefe_t, &status_jefe);
-
 }
-
 
 void *jugador(void *args)
 {
 
-    
-    while (!empezar_jugadores) {}
+    while (!empezar_jugadores)
+    {
+    }
 
     append_to_file(FILENAME_PROBLEMA2, "Iniciando jugador");
 
-    Jugador *data = (struct Jugador *) args;
+    Jugador *data = (struct Jugador *)args;
 
     char jugadorStr[50];
     sprintf(jugadorStr, "Jugador %ld", data->id);
@@ -158,27 +196,39 @@ void *jugador(void *args)
 
     while (true)
     {
-        pensar_jugada(*data);
 
+        sleep_thread(PROBLEMA2_WAIT_TIME);
+        pensar_jugada(data);
+
+        sleep_thread(PROBLEMA2_WAIT_TIME);
         tomar_carta(data);
 
         printf("La carta del jugador %ld es %d\n", data->id, data->carta);
 
         if (data->carta == CARTA_ESPERAR)
         {
+            printf("Jugador %ld procede a esperar reordenamiento debido a su CARTA_ESPERA\n", data->id);
+                    
+            
             pthread_mutex_lock(&mutex_jugadores_disponibles);
             n_esperando++;
+            printf("van a tomar cartaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa %i jugadoresssssssssssssssssssssssssssss\n",n_esperando);
             pthread_mutex_unlock(&mutex_jugadores_disponibles);
-            printf("**************** El valor de esperando es %d ****************\n", n_esperando);
-            printf("**************** El valor de num_jugadores es %d ****************\n", num_jugadores);
-            if (n_esperando == NUM_JUGADORES)
+            sem_wait(&sem_jugadores);
+
+                
+
+            printf("Jugador %ld termino de esperar para jugar CARTA_ESPERA\n", data->id);
+
+
+            if(n_esperando == NUM_JUGADORES)
             {
                 printf("Ya no hay jugadores jugando\n");
                 sem_post(&mutex_jefe);
             }
         }
 
-        jugar(*data);
+        jugar(data);
     }
 
     pthread_exit(NULL);
@@ -186,20 +236,31 @@ void *jugador(void *args)
 
 void *jefeMesa(void *arg)
 {
-    
+
     while (!empezar_jugadores) {}
 
     while (true)
     {
-        reordenamiento_terminado = false;
+
+        sleep_thread(PROBLEMA2_WAIT_TIME);
 
         pensar_reordenamiento();
 
+        reordena = true;
+
+        sleep_thread(PROBLEMA2_WAIT_TIME);
+
         reordenar_tablero();
 
-        printf("El jefe va a desbloquear los jugadores\n");
-
-        reordenamiento_terminado = true;
+        pthread_mutex_lock(&mutex_jugadores_disponibles);
+        printf("se estan liberando %i jugadoresssssssssssssssssssssssssssss\n",n_esperando);
+        for (int i = 0; i < n_esperando; i++)
+        {
+            sem_post(&sem_jugadores);
+        }
+        n_esperando = 0;
+        pthread_mutex_unlock(&mutex_jugadores_disponibles);
+        reordena = false;
     }
 
     pthread_exit(NULL);
