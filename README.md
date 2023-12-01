@@ -7,5 +7,5 @@
 | Integrantes | Cedula |
 | ------ | ------ |
 | Luis A. Sandoval | 26.781.082 |
-| Gustavo Herrera | xxxxx |
-| Jose David Lopez | 30077008 |
+| Gustavo Herrera | 27.852.734 |
+| Jose David Lopez | 30.077.008 |
