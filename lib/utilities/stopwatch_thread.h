@@ -11,7 +11,7 @@
 
 #define STOPWATCH_PROCESS_H
 
-#define INTERVAL 1 // Interval in seconds
+#define INTERVAL 50000000L // Interval in seconds
 
 
 void* stopwatch_thread(void* arg) {
@@ -26,7 +26,7 @@ void* stopwatch_thread(void* arg) {
             break;
     }
     while (1) {
-        nanosleep((const struct timespec[]){{0, 500000000L}}, NULL); // Sleep for 0.1 seconds
+        nanosleep((const struct timespec[]){{0, INTERVAL}}, NULL); // Sleep for 0.1 seconds
         print_time(file_name); // Call the print_time function
     }
 }

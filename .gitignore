@@ -59,3 +59,5 @@ analisis.md
 lib/problema2/problema2_peluca.h
 lib/problema2/problema2_peluca.h
 /out/**
+
+*.txt

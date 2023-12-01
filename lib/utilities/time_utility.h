@@ -41,7 +41,8 @@ void print_time(char* file_name)
     char time[256];
     snprintf(time, sizeof(time), "<Segundos: %ld | Millisegundos: %ld>", elapsed_seconds, elapsed_microseconds);
 
-    append_to_file(file_name, time);
+    //append_to_file(file_name, time);
+    printf("%s\n", time);
 }
 
 #endif

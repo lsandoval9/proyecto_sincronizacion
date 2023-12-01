@@ -47,7 +47,7 @@ void *lector(void *arg)
     while (true)
     {                    
         
-        sleepThread(100000000);
+        sleepThread(PROBLEMA1_WAIT_TIME);
                             // Repetir indefinidamente
         sem_wait(&sem_administracion);       // Esperar a que no haya administradores
         pthread_mutex_lock(&mutex_lectores); // Bloquear el mutex de lectores
@@ -82,7 +82,7 @@ void *escritor(void *arg)
     while (true)
     {                 
         
-        sleepThread(100000000);
+        sleepThread(PROBLEMA1_WAIT_TIME);
                                  // Repetir indefinidamente
         sem_wait(&sem_administracion);         // Esperar a que no haya administradores
         pthread_mutex_lock(&mutex_escritores); // Bloquear el mutex de escritores
@@ -120,7 +120,7 @@ void *administrador(void *arg)
     while (true)
     {                   
         
-        sleepThread(100000000);
+        sleepThread(PROBLEMA1_WAIT_TIME);
                                     // Repetir indefinidamente
         sem_wait(&sem_administracion);              // Esperar a que no haya otro administrador
         pthread_mutex_lock(&mutex_administradores); // Bloquear el mutex de administradores
