@@ -90,7 +90,7 @@ int cartas_disponibles = MAX_CARTAS;
 
 int n_esperando = 0;
 
-long sem_jugadores_value;
+int sem_jugadores_value;
 
 bool reordenado = false;
 bool reordena = false;
@@ -130,7 +130,7 @@ void iniciarProblema2()
     append_to_file(FILENAME_PROBLEMA2, "Iniciando problema 2");
 
     num_jugadores = NUM_JUGADORES;
-    pthread_t *jugadores_t = malloc(sizeof(pthread_t) * NUM_JUGADORES);
+    pthread_t *jugadores_t = (pthread_t*) malloc(sizeof(pthread_t) * NUM_JUGADORES);
     pthread_t jefe_t;
     sem_init(&mazo, 0, MAX_CARTAS);
     sem_init(&reordenando, 0, 0);
@@ -139,7 +139,7 @@ void iniciarProblema2()
     sem_init(&jugadores_disponibles, 0, 0);
     sem_init(&sem_jugadores, 0, 0);
 
-    sem_jugadores_value = (long*) malloc(sizeof(long));
+    sem_jugadores_value = (int*) malloc(sizeof(int));
 
     // inicializar mutex axiliares
 
@@ -207,13 +207,16 @@ void *jugador(void *args)
 
         if (data->carta == CARTA_ESPERAR)
         {
-            pthread_mutex_lock(&mutex_jugadores_disponibles);
+           /* pthread_mutex_lock(&mutex_jugadores_disponibles);
             n_esperando++;
             pthread_mutex_unlock(&mutex_jugadores_disponibles);
             printf("**************** El valor de esperando es %d ****************\n", n_esperando);
-            printf("**************** El valor de num_jugadores es %d ****************\n", num_jugadores);
+            printf("**************** El valor de num_jugadores es %d ****************\n", num_jugadores);*/
+            sem_getvalue(&sem_jugadores, &sem_jugadores_value);
 
-            if (n_esperando == NUM_JUGADORES)
+
+           // if (n_esperando == NUM_JUGADORES)
+            if(sem_jugadores_value == NUM_JUGADORES)
             {
                 printf("Ya no hay jugadores jugando\n");
                 sem_post(&mutex_jefe);
@@ -243,15 +246,15 @@ void *jefeMesa(void *arg)
         sleep_thread(PROBLEMA2_WAIT_TIME);
 
         reordenar_tablero();
-        int aux;
-        sem_getvalue(&sem_jugadores, &aux);
-        for (int i = 0; i < aux; i++)
+
+        sem_getvalue(&sem_jugadores, &sem_jugadores_value);
+        for (int i = 0; i < sem_jugadores_value; i++)
         {
             sem_post(&sem_jugadores);
         }
-        pthread_mutex_lock(&mutex_jugadores_disponibles);
+      /*  pthread_mutex_lock(&mutex_jugadores_disponibles);
         n_esperando = 0;
-        pthread_mutex_unlock(&mutex_jugadores_disponibles);
+        pthread_mutex_unlock(&mutex_jugadores_disponibles);*/
         reordena = false;
     }
 

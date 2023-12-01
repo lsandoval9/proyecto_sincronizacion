@@ -28,7 +28,7 @@ extern int cartas[10];
 extern int n_disponibles;
 extern int jugando;
 extern int cartas_disponibles;
-extern long sem_jugadores_value;
+extern int sem_jugadores_value;
 
 // mutex
 

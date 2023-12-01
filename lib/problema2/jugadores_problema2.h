@@ -37,7 +37,7 @@ extern bool reordena;
 extern bool reordenamiento_terminado;
 extern sem_t sem_jugadores;
 
-extern long sem_jugadores_value;
+extern int sem_jugadores_value;
 // mutex
 
 extern pthread_mutex_t mutex_cartas_disponibles;
@@ -58,10 +58,10 @@ int tomar_carta(struct Jugador *data)
     if (reordena) {
 
         //cambios aqui
-        pthread_mutex_lock(&mutex_jugadores_disponibles);
+        /*pthread_mutex_lock(&mutex_jugadores_disponibles);
         n_esperando++;
 
-        pthread_mutex_unlock(&mutex_jugadores_disponibles);
+        pthread_mutex_unlock(&mutex_jugadores_disponibles);*/
 
         sem_wait(&sem_jugadores);
 
@@ -97,9 +97,9 @@ void pensar_jugada(struct Jugador *data)
         printf("Jugador %ld en espera reordenamiento\n", data->id);
 
         //cambios aqui
-        pthread_mutex_lock(&mutex_jugadores_disponibles);
+        /*pthread_mutex_lock(&mutex_jugadores_disponibles);
         n_esperando++;
-        pthread_mutex_unlock(&mutex_jugadores_disponibles);
+        pthread_mutex_unlock(&mutex_jugadores_disponibles);*/
 
         sem_wait(&sem_jugadores);
     }
