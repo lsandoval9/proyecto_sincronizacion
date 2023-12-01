@@ -13,6 +13,7 @@
 extern sem_t mazo, reordenando, mutex_mazo;
 extern int num_jugadores;
 extern bool reordenado;
+
 extern bool jefe_esperando;
 extern bool reordenamiento_terminado;
 extern int cartas[10];
@@ -46,11 +47,8 @@ void reordenar_tablero()
     pthread_mutex_unlock(&mutex_cartas_disponibles);
     printf("El jefe de mesa ha terminado de reordenar el tablero\n");
     sem_post(&mutex_mazo);
-    for (int i = 0; i < n_esperando; i++)
-    {
-        sem_post(&jugadores);
-    }
-    printf("El jefe de mesa ha terminado de reordenar el tablero DESPUES MUTEX\n");
+ 
+    printf("El jefe de mesa ha terminado de reordenar el tablero. Por lo tanto, dara lugar a que los jugadores que esperaban vuelvan a jugar\n");
     
 }
 

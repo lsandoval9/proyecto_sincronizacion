@@ -22,6 +22,7 @@ extern int cartas[MAX_CARTAS];
 extern int cartas_disponibles;
 
 extern bool jefe_esperando;
+extern bool reordena;
 extern bool reordenamiento_terminado;
 extern sem_t sem_jugadores;
 // mutex
@@ -41,14 +42,23 @@ void esperar_reordenamiento();
 int tomar_carta(struct Jugador *data)
 {
 
-    void esperar_reordenamiento();
+    if (reordena) {
+
+        //cambios aqui
+        pthread_mutex_lock(&mutex_jugadores_disponibles);
+        n_esperando++;
+        pthread_mutex_unlock(&mutex_jugadores_disponibles);
+
+        sem_wait(&sem_jugadores);
+
+    }
 
     sem_wait(&mazo);
     sem_wait(&mutex_mazo);
     int aux = cartas[cartas_disponibles - 1];
     data->carta = aux;
     printf("Jugador %ld tomo carta %d\n", data->id, aux);
-    printf("Cartas disponibles: %d\n", cartas_disponibles);
+    printf("Cartas disponibles: %d\n", cartas_disponibles-1);
     pthread_mutex_lock(&mutex_cartas_disponibles);
     cartas_disponibles--;
     pthread_mutex_unlock(&mutex_cartas_disponibles);
@@ -65,9 +75,17 @@ int tomar_carta(struct Jugador *data)
 void pensar_jugada(struct Jugador data)
 {
     printf("Jugador %ld pensando jugada\n", data.id);
-    if (reordenado) {
+
+
+    if (reordena) {
         printf("Jugador %ld en espera reordenamiento\n", data.id);
-        pthread_mutex_lock(&mutex_reordenando);
+
+        //cambios aqui
+        pthread_mutex_lock(&mutex_jugadores_disponibles);
+        n_esperando++;
+        pthread_mutex_unlock(&mutex_jugadores_disponibles);
+
+        sem_wait(&sem_jugadores);
     }
 }
 
@@ -76,11 +94,10 @@ void jugar(struct Jugador data)
 
     if (data.carta == CARTA_ESPERAR)
     {
-        printf("Jugador %ld n_disponibles para jugar CARTA_ESPERA\n", data.id);
-        //sem_wait(&mutex_jugadores_esperando);
+        printf("Jugador %ld procede a esperar reordenamiento debido a su CARTA_ESPERA\n", data.id);
+        sem_wait(&sem_jugadores);
         printf("Jugador %ld termino de esperar para jugar CARTA_ESPERA\n", data.id);
         
-        void esperar_reordenamiento();
 
         /*
         bool es_ultimo = false;// inicia la variable
@@ -106,9 +123,6 @@ void jugar(struct Jugador data)
     }
 }
 
-void esperar_reordenamiento() {
 
-    while (!reordenamiento_terminado) {}
-}
 
 #endif // JUGADORES_PROBLEMA2_H
