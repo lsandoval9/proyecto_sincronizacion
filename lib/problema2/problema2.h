@@ -30,6 +30,28 @@ typedef struct Jugador
 
 } Jugador;
 
+/**
+ * @brief estructura que representa las estadisticas de una partida
+ * @param reordenadas_total numero de veces que se ha reordenado el tablero
+ * @param cartas_jugar_total numero de cartas que se han jugado
+ * @param cartas_esperar_total numero de cartas que se han esperado
+*/
+typedef struct EstadisticasPartida
+{
+    int reordenadas_total;
+    int cartas_jugar_total;
+    int cartas_esperar_total;
+} EstadisticasPartida;
+
+// Mutex para estadisticas
+pthread_mutex_t mutex_reordenadas_total = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t mutex_cartas_jugar_total = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t mutex_cartas_esperar_total = PTHREAD_MUTEX_INITIALIZER;
+
+// mutex estadisticas del jugador
+pthread_mutex_t mutex_cartas_jugar = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t mutex_cartas_esperar = PTHREAD_MUTEX_INITIALIZER;
+
 // prototipos de funciones
 /**
  * @brief funcion que representa la ejecucion de un jugador
@@ -60,6 +82,11 @@ int jugando = 0;
 
 int cartas[10];
 
+
+// Estadisticas
+EstadisticasPartida estadisticas = {0, 0, 0};
+
+
 /**
  * 0: carta para esperar
  * 1: carta para jugar
@@ -84,6 +111,9 @@ pthread_mutex_t mutex_cartas_disponibles = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutex_reordenando = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutex_jugadores_disponibles = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutex_jugadores_esperando = PTHREAD_MUTEX_INITIALIZER;
+
+
+
 
 
 /**

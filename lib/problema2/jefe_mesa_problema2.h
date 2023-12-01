@@ -9,6 +9,14 @@
 
 #define JEFE_MESA_PROBLEMA2_H
 
+
+// estadisticas
+
+extern struct EstadisticasPartida estadisticas;
+
+// mutex estadisticas
+extern pthread_mutex_t mutex_reordenadas_total;
+
 // variables externas
 extern sem_t mazo, reordenando, mutex_mazo;
 extern int num_jugadores;
@@ -46,6 +54,12 @@ void reordenar_tablero()
     cartas_disponibles = MAX_CARTAS;
     pthread_mutex_unlock(&mutex_cartas_disponibles);
     printf("El jefe de mesa ha terminado de reordenar el tablero\n");
+
+    pthread_mutex_lock(&mutex_reordenadas_total);
+    estadisticas.reordenadas_total++;
+    printf("El jefe de mesa ha reordenado el tablero %d veces\n", estadisticas.reordenadas_total);
+    pthread_mutex_unlock(&mutex_reordenadas_total);
+
     sem_post(&mutex_mazo);
  
     printf("El jefe de mesa ha terminado de reordenar el tablero. Por lo tanto, dara lugar a que los jugadores que esperaban vuelvan a jugar\n");
