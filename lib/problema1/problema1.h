@@ -16,7 +16,6 @@
 
 #define PROBLEMA1_H
 
-
 typedef struct InfoProceso
 {
     int id;
@@ -25,15 +24,19 @@ typedef struct InfoProceso
 
 /*------ PROCEDIMIENTOS PARA LOS PROCESOS ------*/
 
-sem_t sem_cola_lectores, sem_lector, sem_contador_lectores;
-sem_t sem_contador_escritores, sem_escritor;
-int contador_lectores;
-int contador_escritores;
-int contador_administradores;
+
+
+// Definir las variables globales
+sem_t sem_lectura;                     // Semáforo para controlar el acceso de los lectores
+sem_t sem_escritura;                   // Semáforo para controlar el acceso de los escritores
+sem_t sem_administracion;              // Semáforo para controlar el acceso de los administradores
+int lectores;                          // Contador de lectores activos
+int escritores;                        // Contador de escritores activos
+int administradores;                   // Contador de administradores activos
+pthread_mutex_t mutex_lectores;        // Mutex para proteger el contador de lectores
+pthread_mutex_t mutex_escritores;      // Mutex para proteger el contador de escritores
+pthread_mutex_t mutex_administradores; // Mutex para proteger el contador de administradores
 bool inicializado = false;
-
-
-
 /*CODIGO PRINCIPAL*/
 
 void iniciarProblema1()
@@ -41,43 +44,70 @@ void iniciarProblema1()
     srand(time(NULL));
     pthread_t hilo_L_E[CANTIDAD_THREAD];
     int tipo_proceso;
-    sem_init(&sem_cola_lectores, 0, 1);
-    sem_init(&sem_lector, 0, 1);
-    sem_init(&sem_contador_lectores, 0, 1);
-    sem_init(&sem_contador_escritores, 0, 1);
-    sem_init(&sem_escritor, 0, 1);
-    contador_lectores = 0;
-    contador_escritores = 0;
-    contador_administradores = 0;
-    for (int i = 0; i < CANTIDAD_THREAD; i++)
+
+    // NUEVOS
+
+    sem_init(&sem_lectura, 0, 1);
+    sem_init(&sem_escritura, 0, 1);
+    sem_init(&sem_administracion, 0, 1);
+    lectores = 0;
+    escritores = 0;
+    administradores = 0;
+    pthread_mutex_init(&mutex_lectores, NULL);
+    pthread_mutex_init(&mutex_escritores, NULL);
+    pthread_mutex_init(&mutex_administradores, NULL);
+
+
+    for (size_t i = 0; i < N_LECTORES; i++)
     {
-        tipo_proceso = ((i + 1) + rand()) % 3;
-        if (tipo_proceso == 1)
+        if (pthread_create(&hilo_L_E[i], NULL, *lector, NULL) != 0)
         {
-            pthread_create(&hilo_L_E[i], NULL, *lectores, NULL);
-            contador_lectores++;
+            perror("Error al crear el hilo lector");
+            exit(EXIT_FAILURE);
         }
-        else if (tipo_proceso == 2)
-        {
-            pthread_create(&hilo_L_E[i], NULL, *escritores, NULL);
-            contador_escritores++;
-        }
-        else
-        {
-            pthread_create(&hilo_L_E[i], NULL, *administrador, NULL);
-            contador_administradores++;
-        }
+        lectores++;
     }
 
-    printf("total procesos lectores: %d\n", contador_lectores);
-    printf("total procesos escritores: %d\n", contador_escritores);
-    printf("total procesos administradores: %d\n", contador_administradores);
+    for (size_t i = 0; i < N_ESCRITORES; i++)
+    {
+        if (pthread_create(&hilo_L_E[i], NULL, *escritor, NULL) != 0)
+        {
+            perror("Error al crear el hilo escritor");
+            exit(EXIT_FAILURE);
+        }
+        escritores++;
+    }
+
+    for (size_t i = 0; i < N_ADMINISTRADORES; i++)
+    {
+        if (pthread_create(&hilo_L_E[i], NULL, *administrador, NULL) != 0)
+        {
+            perror("Error al crear el hilo administrador");
+            exit(EXIT_FAILURE);
+        }
+
+        administradores++;
+    }
+    
+
+    printf("total procesos lectores: %d\n", lectores);
+    printf("total procesos escritores: %d\n", escritores);
+    printf("total procesos administradores: %d\n", administradores);
+
+    char aux[100];
+
+    sprintf(aux, "total procesos lectores: %d", lectores);
+    append_to_file(FILENAME_PROBLEMA1, aux);
+
+    sprintf(aux, "total procesos escritores: %d", escritores);
+    append_to_file(FILENAME_PROBLEMA1, aux);
+
+    sprintf(aux, "total procesos administradores: %d", administradores);
+    append_to_file(FILENAME_PROBLEMA1, aux);
+
 
     inicializado = true;
     while (true) {}
 }
-
-// NOTA: FALTA UN CICLO PARA LOS DÍAS, Y SOLO FALTA FALTA LAS FUNCIONES PARA ESCRIBIR EN UN ARCHIVO DE TEXTO, LA ESTRUCTURA YA ESTÁ HECHA.
-//  LA CANTIDAD DE PROCESOS SE CONFIGURAN POR CONSTANTE, EN UN RATO SUBO LA NUEVA VERSIÓN :v
 
 #endif
