@@ -31,6 +31,7 @@ extern sem_t mazo, reordenando, mutex_mazo;
 extern int num_jugadores;
 extern int cartas[MAX_CARTAS];
 extern int cartas_disponibles;
+extern int n_esperando;
 
 extern bool jefe_esperando;
 extern bool reordena;
@@ -58,12 +59,13 @@ int tomar_carta(struct Jugador *data)
     if (reordena) {
 
         //cambios aqui
-        /*pthread_mutex_lock(&mutex_jugadores_disponibles);
+        pthread_mutex_lock(&mutex_jugadores_disponibles);
         n_esperando++;
-
-        pthread_mutex_unlock(&mutex_jugadores_disponibles);*/
+        printf("se esta reordenando en tomar carta %i jugadoresssssssssssssssssssssssssssss\n",n_esperando);
+        pthread_mutex_unlock(&mutex_jugadores_disponibles);
 
         sem_wait(&sem_jugadores);
+
 
     }
 
@@ -97,9 +99,10 @@ void pensar_jugada(struct Jugador *data)
         printf("Jugador %ld en espera reordenamiento\n", data->id);
 
         //cambios aqui
-        /*pthread_mutex_lock(&mutex_jugadores_disponibles);
+        pthread_mutex_lock(&mutex_jugadores_disponibles);
         n_esperando++;
-        pthread_mutex_unlock(&mutex_jugadores_disponibles);*/
+        printf("se esta reordenando en pensar jugada %i jugadoresssssssssssssssssssssssssssss\n",n_esperando);
+        pthread_mutex_unlock(&mutex_jugadores_disponibles);
 
         sem_wait(&sem_jugadores);
     }
@@ -110,11 +113,8 @@ void jugar(struct Jugador *data)
 
     if (data->carta == CARTA_ESPERAR)
     {
-        printf("Jugador %ld procede a esperar reordenamiento debido a su CARTA_ESPERA\n", data->id);
-        sem_wait(&sem_jugadores);
-        printf("Jugador %ld termino de esperar para jugar CARTA_ESPERA\n", data->id);
+  
         
-
         data->cartas_esperar++;
         printf("Jugador %ld tiene %d cartas esperar\n", data->id, data->cartas_esperar);
 

@@ -44,7 +44,6 @@ void colocar_carta_en_mazo(int carta, int i);
 
 void reordenar_tablero()
 {
-    
     sem_wait(&mutex_mazo);
     for (int i = 0; i < MAX_CARTAS; i++)
     {

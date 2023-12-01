@@ -207,16 +207,21 @@ void *jugador(void *args)
 
         if (data->carta == CARTA_ESPERAR)
         {
-           /* pthread_mutex_lock(&mutex_jugadores_disponibles);
+            printf("Jugador %ld procede a esperar reordenamiento debido a su CARTA_ESPERA\n", data->id);
+                    
+            
+            pthread_mutex_lock(&mutex_jugadores_disponibles);
             n_esperando++;
+            printf("van a tomar cartaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa %i jugadoresssssssssssssssssssssssssssss\n",n_esperando);
             pthread_mutex_unlock(&mutex_jugadores_disponibles);
-            printf("**************** El valor de esperando es %d ****************\n", n_esperando);
-            printf("**************** El valor de num_jugadores es %d ****************\n", num_jugadores);*/
-            sem_getvalue(&sem_jugadores, &sem_jugadores_value);
+            sem_wait(&sem_jugadores);
+
+                
+
+            printf("Jugador %ld termino de esperar para jugar CARTA_ESPERA\n", data->id);
 
 
-           // if (n_esperando == NUM_JUGADORES)
-            if(sem_jugadores_value == NUM_JUGADORES)
+            if(n_esperando == NUM_JUGADORES)
             {
                 printf("Ya no hay jugadores jugando\n");
                 sem_post(&mutex_jefe);
@@ -247,14 +252,14 @@ void *jefeMesa(void *arg)
 
         reordenar_tablero();
 
-        sem_getvalue(&sem_jugadores, &sem_jugadores_value);
-        for (int i = 0; i < sem_jugadores_value; i++)
+        pthread_mutex_lock(&mutex_jugadores_disponibles);
+        printf("se estan liberando %i jugadoresssssssssssssssssssssssssssss\n",n_esperando);
+        for (int i = 0; i < n_esperando; i++)
         {
             sem_post(&sem_jugadores);
         }
-      /*  pthread_mutex_lock(&mutex_jugadores_disponibles);
         n_esperando = 0;
-        pthread_mutex_unlock(&mutex_jugadores_disponibles);*/
+        pthread_mutex_unlock(&mutex_jugadores_disponibles);
         reordena = false;
     }
 
