@@ -36,6 +36,8 @@ extern bool jefe_esperando;
 extern bool reordena;
 extern bool reordenamiento_terminado;
 extern sem_t sem_jugadores;
+
+extern long sem_jugadores_value;
 // mutex
 
 extern pthread_mutex_t mutex_cartas_disponibles;
@@ -58,6 +60,7 @@ int tomar_carta(struct Jugador *data)
         //cambios aqui
         pthread_mutex_lock(&mutex_jugadores_disponibles);
         n_esperando++;
+
         pthread_mutex_unlock(&mutex_jugadores_disponibles);
 
         sem_wait(&sem_jugadores);
@@ -79,6 +82,8 @@ int tomar_carta(struct Jugador *data)
         sem_post(&mutex_jefe);
     }
     sem_post(&mutex_mazo);
+
+    
 
     return aux;
 }

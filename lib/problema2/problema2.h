@@ -9,6 +9,8 @@
 #include "../config/problema2_config.h"
 #include "../utilities/file_utility.h"
 
+#include "../utilities/sleep_thread_utility.h"
+
 #ifndef PROBLEMA2_H
 
 // Definir constante de proteccion
@@ -88,6 +90,8 @@ int cartas_disponibles = MAX_CARTAS;
 
 int n_esperando = 0;
 
+long sem_jugadores_value;
+
 bool reordenado = false;
 bool reordena = false;
 bool jefe_esperando = false;
@@ -134,6 +138,8 @@ void iniciarProblema2()
     sem_init(&mutex_mazo, 0, 1);
     sem_init(&jugadores_disponibles, 0, 0);
     sem_init(&sem_jugadores, 0, 0);
+
+    sem_jugadores_value = (long*) malloc(sizeof(long));
 
     // inicializar mutex axiliares
 
@@ -237,8 +243,9 @@ void *jefeMesa(void *arg)
         sleep_thread(PROBLEMA2_WAIT_TIME);
 
         reordenar_tablero();
-
-        for (int i = 0; i < n_esperando; i++)
+        int aux;
+        sem_getvalue(&sem_jugadores, &aux);
+        for (int i = 0; i < aux; i++)
         {
             sem_post(&sem_jugadores);
         }
