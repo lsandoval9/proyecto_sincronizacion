@@ -47,9 +47,9 @@ void iniciarProblema1()
 
     // NUEVOS
 
-    sem_init(&sem_lectura, 0, 1);
-    sem_init(&sem_escritura, 0, 1);
-    sem_init(&sem_administracion, 0, 1);
+    sem_init(&sem_lectura, 0, N_LECTORES);
+    sem_init(&sem_escritura, 0, N_ESCRITORES);
+    sem_init(&sem_administracion, 0, N_ADMINISTRADORES);
     lectores = 0;
     escritores = 0;
     administradores = 0;

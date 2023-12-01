@@ -29,6 +29,12 @@ extern pthread_mutex_t mutex_lectores;
 extern pthread_mutex_t mutex_escritores;
 extern pthread_mutex_t mutex_administradores;
 
+
+long long lecturas = 0;
+long long escrituras = 0;
+long long administraciones = 0;
+
+
 #ifndef PROCESOS_H
 
 #define PROCESOS_H
@@ -49,7 +55,7 @@ void *lector(void *arg)
         
         sleepThread(PROBLEMA1_WAIT_TIME);
                             // Repetir indefinidamente
-        sem_wait(&sem_administracion);       // Esperar a que no haya administradores
+        // sem_wait(&sem_administracion);       // Esperar a que no haya administradores
         pthread_mutex_lock(&mutex_lectores); // Bloquear el mutex de lectores
         lectores++;                          // Incrementar el contador de lectores
         if (lectores == 1)
@@ -57,9 +63,10 @@ void *lector(void *arg)
             sem_wait(&sem_escritura); // Esperar a que no haya escritores
         }
         pthread_mutex_unlock(&mutex_lectores); // Desbloquear el mutex de lectores
-        sem_post(&sem_administracion);         // Permitir que haya administradores
+        // sem_post(&sem_administracion);         // Permitir que haya administradores
         
-        printf("Lector leyendo...\n");
+        lecturas++;
+        printf("$ Lector leyendo... %lld operaciones de lectura en total\n", lecturas);
 
         pthread_mutex_lock(&mutex_lectores); // Bloquear el mutex de lectores
         lectores--;                          // Decrementar el contador de lectores
@@ -96,7 +103,8 @@ void *escritor(void *arg)
 
         sem_wait(&sem_escritura); // Esperar a que no haya otro escritor
 
-        printf("Escritor escribiendo...\n");
+        escrituras++;
+        printf("* Escritor escribiendo... %lld operaciones de escritura en total\n", escrituras);
 
         sem_post(&sem_escritura); // Permitir que haya otro escritor
 
@@ -133,7 +141,8 @@ void *administrador(void *arg)
         pthread_mutex_unlock(&mutex_administradores); // Desbloquear el mutex de administradores
         sem_post(&sem_administracion);                // Permitir que haya otro administrador
 
-        printf("Administrador administrando...\n");
+        administraciones++;
+        printf("# Administrador administrando... %lld operaciones de administracion en total\n", administraciones);
 
         pthread_mutex_lock(&mutex_administradores); // Bloquear el mutex de administradores
         administradores--;                          // Decrementar el contador de administradores
