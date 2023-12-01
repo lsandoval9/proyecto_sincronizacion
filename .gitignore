@@ -36,6 +36,7 @@
 *.x86_64
 *.hex
 main
+main.bin
 
 # Debug files
 *.dSYM/
@@ -54,3 +55,9 @@ dkms.conf
 
 
 .vscode/
+analisis.md
+lib/problema2/problema2_peluca.h
+lib/problema2/problema2_peluca.h
+/out/**
+
+*.txt
