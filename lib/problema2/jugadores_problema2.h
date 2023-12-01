@@ -85,7 +85,7 @@ void esperar_reordenamiento(struct Jugador *data)
     }
     pthread_mutex_unlock(&mutex_jugadores);
     
-    sem_wait(&jugadores_disponibles);
+    sem_wait(&sem_jugadores);
 
 }
 

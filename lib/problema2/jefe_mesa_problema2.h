@@ -25,7 +25,7 @@ extern pthread_mutex_t mutex_esperando;
 extern pthread_mutex_t mutex_cartas_disponibles;
 extern pthread_mutex_t mutex_reordenando;
 extern sem_t mutex_jefe;
-extern sem_t jugadores_disponibles;
+extern sem_t sem_jugadores;
 
 void pensar_reordenamiento();
 void reordenar_tablero();

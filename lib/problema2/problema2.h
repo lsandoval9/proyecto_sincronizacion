@@ -63,11 +63,13 @@ sem_t mazo;
 sem_t reordenando;
 sem_t jugadores;
 sem_t mutex_jefe;
-sem_t jugadores_disponibles;
+sem_t sem_jugadores;
 
 int jugando = 0;
 
 int cartas[10];
+
+int jugadores_disponibles = NUM_JUGADORES;
 
 bool jugadores_jugando_bool[NUM_JUGADORES];
 
@@ -128,7 +130,7 @@ void iniciarProblema2()
     sem_init(&reordenando, 0, 0);
     sem_init(&mutex_jefe, 0, 1);
     sem_init(&mutex_mazo, 0, 1);
-    sem_init(&jugadores_disponibles, 0, 0);
+    sem_init(&sem_jugadores, 0, 0);
 
     // inicializar mutex axiliares
 
@@ -178,16 +180,18 @@ void *jugador(void *args)
     while (true)
     {
         
+        // TODO: necesita un mutex o un semaforo para cuando el jefe pasa
+        // TODO: El contador de cartas no funciona
         pthread_mutex_lock(&mutex_jugadores);
-        
         if (!jugadores_jugando_bool[data->id])
         {
             jugadores_jugando_bool[data->id] = true;
             jugadores_jugando++;
-            printf("Jugador %ld jugando\n", data->id);
+            printf("Jugador %ld comenzo a jugar\n", data->id);
+            printf("Jugadores jugando: %d\n", jugadores_jugando);
         }
-        printf("Jugadores jugando: %d\n", jugadores_jugando);
-        if (jugadores_jugando == 1)
+
+        if (sem_jugadores == 1)
         {
             sem_wait(&mutex_jefe);
         }
@@ -203,7 +207,8 @@ void *jugador(void *args)
         {
             jugar(data);
         }
-        else
+        
+        if (false)
         {
             esperar_reordenamiento(data);
         }
@@ -237,7 +242,7 @@ void *jefeMesa(void *arg)
         carta_actual = MAX_CARTAS - 1;
         for (int i = 0; i < NUM_JUGADORES; i++)
         {
-            sem_post(&jugadores_disponibles);
+            sem_post(&sem_jugadores);
         }
         jugadores_jugando = NUM_JUGADORES;
         sem_post(&mutex_mazo);
