@@ -20,9 +20,14 @@
 sem_t sem_lectura;                     // Semáforo para controlar el acceso de los lectores
 sem_t sem_escritura;                   // Semáforo para controlar el acceso de los escritores
 sem_t sem_administracion;              // Semáforo para controlar el acceso de los administradores
-int lectores;                          // Contador de lectores activos
-int escritores;                        // Contador de escritores activos
-int administradores;                   // Contador de administradores activos
+int lectores = 0;                          // Contador de lectores activos
+int escritores = 0;                        // Contador de escritores activos
+int administradores = 0;                   // Contador de administradores activos
+
+int lectores_activos = 0;                 // Contador de lectores activos
+int escritores_activos = 0;               // Contador de escritores activos
+int administradores_activos = 0;          // Contador de administradores activos
+
 pthread_mutex_t mutex_lectores;        // Mutex para proteger el contador de lectores
 pthread_mutex_t mutex_escritores;      // Mutex para proteger el contador de escritores
 pthread_mutex_t mutex_administradores; // Mutex para proteger el contador de administradores
