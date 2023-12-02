@@ -125,8 +125,8 @@ pthread_mutex_t mutex_cartas_esperar = PTHREAD_MUTEX_INITIALIZER;
 void iniciarProblema2()
 {
 
-    num_jugadores = 10;
-    pthread_t *jugadores_t = (pthread_t *)malloc(sizeof(pthread_t) * 10);
+    num_jugadores = NUM_JUGADORES;
+    pthread_t *jugadores_t = (pthread_t *)malloc(sizeof(pthread_t) * NUM_JUGADORES);
     pthread_t jefe_t;
     sem_init(&mazo, 0, MAX_CARTAS);
     sem_init(&reordenando, 0, 0);
@@ -148,7 +148,7 @@ void iniciarProblema2()
         cartas[i] = rand() / (RAND_MAX / 2);
     }
 
-    for (long i = 0; i < 10; i++)
+    for (long i = 0; i < NUM_JUGADORES; i++)
     {
         Jugador *data = malloc(sizeof(Jugador));
         data->id = i;
@@ -206,7 +206,7 @@ void *jugador(void *args)
 
             printf("Jugador %ld termino de esperar para jugar CARTA_ESPERA\n", data->id);
 
-            if (n_esperando == 10)
+            if (n_esperando == NUM_JUGADORES)
             {
                 printf("Ya no hay jugadores jugando\n");
                 sem_post(&mutex_jefe);
