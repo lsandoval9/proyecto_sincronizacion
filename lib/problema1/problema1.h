@@ -16,16 +16,6 @@
 
 #define PROBLEMA1_H
 
-typedef struct InfoProceso
-{
-    int id;
-    int tipo;
-} InfoProceso;
-
-/*------ PROCEDIMIENTOS PARA LOS PROCESOS ------*/
-
-
-
 // Definir las variables globales
 sem_t sem_lectura;                     // Semáforo para controlar el acceso de los lectores
 sem_t sem_escritura;                   // Semáforo para controlar el acceso de los escritores
@@ -37,13 +27,16 @@ pthread_mutex_t mutex_lectores;        // Mutex para proteger el contador de lec
 pthread_mutex_t mutex_escritores;      // Mutex para proteger el contador de escritores
 pthread_mutex_t mutex_administradores; // Mutex para proteger el contador de administradores
 bool inicializado = false;
-/*CODIGO PRINCIPAL*/
 
+/**
+ * @brief Función que inicializa el problema 1
+ */
 void iniciarProblema1()
 {
     srand(time(NULL));
-    pthread_t hilo_L_E[CANTIDAD_THREAD];
-    int tipo_proceso;
+    pthread_t hilo_administrador[N_ADMINISTRADORES];
+    pthread_t hilo_lector[N_LECTORES];
+    pthread_t hilo_escritor[N_ESCRITORES];
 
     // NUEVOS
 
@@ -57,57 +50,74 @@ void iniciarProblema1()
     pthread_mutex_init(&mutex_escritores, NULL);
     pthread_mutex_init(&mutex_administradores, NULL);
 
-
+    // inicializar los lectores
     for (size_t i = 0; i < N_LECTORES; i++)
     {
-        if (pthread_create(&hilo_L_E[i], NULL, *lector, NULL) != 0)
+        if (pthread_create(&hilo_lector[i], NULL, *lector, NULL) != 0)
         {
             perror("Error al crear el hilo lector");
             exit(EXIT_FAILURE);
         }
         lectores++;
+        
     }
 
+    // inicializar los escritores
     for (size_t i = 0; i < N_ESCRITORES; i++)
     {
-        if (pthread_create(&hilo_L_E[i], NULL, *escritor, NULL) != 0)
+        if (pthread_create(&hilo_escritor[i], NULL, *escritor, NULL) != 0)
         {
             perror("Error al crear el hilo escritor");
             exit(EXIT_FAILURE);
         }
         escritores++;
+        
     }
 
+    // inicializar los administradores
     for (size_t i = 0; i < N_ADMINISTRADORES; i++)
     {
-        if (pthread_create(&hilo_L_E[i], NULL, *administrador, NULL) != 0)
+        if (pthread_create(&hilo_administrador[i], NULL, *administrador, NULL) != 0)
         {
             perror("Error al crear el hilo administrador");
             exit(EXIT_FAILURE);
         }
 
         administradores++;
+        
     }
-    
 
     printf("total procesos lectores: %d\n", lectores);
     printf("total procesos escritores: %d\n", escritores);
     printf("total procesos administradores: %d\n", administradores);
 
-    char aux[100];
-
-    sprintf(aux, "total procesos lectores: %d", lectores);
-    append_to_file(FILENAME_PROBLEMA1, aux);
-
-    sprintf(aux, "total procesos escritores: %d", escritores);
-    append_to_file(FILENAME_PROBLEMA1, aux);
-
-    sprintf(aux, "total procesos administradores: %d", administradores);
-    append_to_file(FILENAME_PROBLEMA1, aux);
-
-
     inicializado = true;
-    while (true) {}
+    
+    for (size_t i = 0; i < N_LECTORES; i++)
+    {
+        pthread_join(hilo_lector[i], NULL);
+    }
+
+    for (size_t i = 0; i < N_ESCRITORES; i++)
+    {
+        pthread_join(hilo_escritor[i], NULL);
+    }
+
+    for (size_t i = 0; i < N_ADMINISTRADORES; i++)
+    {
+        pthread_join(hilo_administrador[i], NULL);
+    }
+
+    // liberar memoria
+
+    sem_destroy(&sem_lectura);
+    sem_destroy(&sem_escritura);
+    sem_destroy(&sem_administracion);
+    pthread_mutex_destroy(&mutex_lectores);
+    pthread_mutex_destroy(&mutex_escritores);
+    pthread_mutex_destroy(&mutex_administradores);
+
+
 }
 
 #endif
