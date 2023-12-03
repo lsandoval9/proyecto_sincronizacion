@@ -193,6 +193,8 @@ void *jugador(void *args)
         sleep_thread(PROBLEMA2_WAIT_TIME);
         tomar_carta(data);
 
+        // !fix
+
         printf("La carta del jugador %ld es %d\n", data->id, data->carta);
 
         if (data->carta == CARTA_ESPERAR)
@@ -204,13 +206,12 @@ void *jugador(void *args)
             printf("van a tomar carta%i jugadores\n", n_esperando);
             pthread_mutex_unlock(&mutex_jugadores_disponibles);
 
-            printf("Jugador %ld termino de esperar para jugar CARTA_ESPERA\n", data->id);
-
             if (n_esperando == NUM_JUGADORES)
             {
                 printf("Ya no hay jugadores jugando\n");
                 sem_post(&mutex_jefe);
             }
+            printf("COLGADO EN SEM_JUGADORES\n");
             sem_wait(&sem_jugadores);
         }
 
@@ -223,9 +224,7 @@ void *jugador(void *args)
 void *jefeMesa(void *arg)
 {
 
-    while (!empezar_jugadores)
-    {
-    }
+    while (!empezar_jugadores) {}
 
     while (true)
     {
@@ -245,6 +244,7 @@ void *jefeMesa(void *arg)
         reordena = false;
         for (int i = 0; i < n_esperando; i++)
         {
+            printf("se libero jugador por %i\n", i);
             sem_post(&sem_jugadores);
         }
         n_esperando = 0;

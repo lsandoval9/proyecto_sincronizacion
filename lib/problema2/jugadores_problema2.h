@@ -65,8 +65,6 @@ int tomar_carta(struct Jugador *data)
 
         sem_wait(&sem_jugadores);
 
-
-
     }
 
     sem_wait(&mazo);
@@ -111,14 +109,15 @@ void jugar(struct Jugador *data)
 
     if (data->carta == CARTA_ESPERAR)
     {
-  
         
         data->cartas_esperar++;
+        // mutex
         printf("Jugador %ld tiene %d cartas esperar\n", data->id, data->cartas_esperar);
 
         pthread_mutex_lock(&mutex_cartas_esperar);
         estadisticas.cartas_esperar_total += 1;
         printf("Hay %d cartas esperar en total\n", estadisticas.cartas_esperar_total);
+        // mutex
         pthread_mutex_unlock(&mutex_cartas_esperar);
 
     }
