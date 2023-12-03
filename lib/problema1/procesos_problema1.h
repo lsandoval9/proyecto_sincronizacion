@@ -97,6 +97,7 @@ void *lector(void *arg)
         lectores_activos++;
         lecturas++;
         pthread_mutex_unlock(&mutex_aux_lectura);
+        printf("# Lector %ld preguntando si hay escritores\n", proceso->id);
         if (escritores_activos > 0)
         { // Si hay lectores
             printf("# Lector %ld esperando a que no haya escritores \n", proceso->id);
@@ -118,6 +119,7 @@ void *lector(void *arg)
             pthread_mutex_unlock(&mutex_lectores_activos);
         }
         pthread_mutex_unlock(&mutex_aux_lectura);
+        printf("# Lector %ld sale\n", proceso->id);
     }
     return NULL; // Finalizar el hilo
 }
@@ -136,8 +138,9 @@ void *escritor(void *arg)
     {
         sleep_thread(PROBLEMA1_WAIT_TIME);
 
-        printf("$ Escritor %ld pregunta si hay administradores administrando\n", proceso->id);
+        
         pthread_mutex_lock(&mutex_administracion_escritura);
+        printf("$ Escritor %ld pregunta si hay administradores administrando\n", proceso->id);
         if (administradores_activos > 0)
         { // Si hay un administrador
             printf("$ Escritor %ld esperando a que no haya administradores\n", proceso->id);
@@ -152,6 +155,7 @@ void *escritor(void *arg)
         pthread_mutex_lock(&mutex_aux_escritura);
         escritores_activos++;
         pthread_mutex_unlock(&mutex_aux_escritura);
+        printf("$ Escritor %ld preguntando si hay lectores\n", proceso->id);
         if (lectores_activos > 0)
         { // Si hay lectores
             printf("$ Escritor %ld esperando a que no haya lectores \n", proceso->id);
@@ -175,6 +179,7 @@ void *escritor(void *arg)
             pthread_mutex_unlock(&mutex_escritores_activos);
         }
         pthread_mutex_unlock(&mutex_aux_escritura);
+        printf("$ Escritor %ld sale\n", proceso->id);
     }
     return NULL; // Finalizar el hilo
 }
