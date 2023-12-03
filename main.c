@@ -13,7 +13,6 @@
 
 #include "lib/problema2/problema2.h"
 #include "lib/problema1/problema1.h"
-#include "lib/utilities/file_utility.h"
 #include "lib/utilities/time_utility.h"
 #include "lib/utilities/stopwatch_thread.h"
 

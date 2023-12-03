@@ -8,15 +8,13 @@
 
 #include "../config/problema1_config.h"
 
-#include "file_utility.h"
-
 extern struct timeval start_time;
 
 #ifndef DATE_UTILITY_H
 
 #define DATE_UTILITY_H
 
-void print_time(char* file_name) 
+void print_time() 
 {
     struct timeval current_time;
 

@@ -17,7 +17,6 @@ typedef struct Proceso
 
 
 #include "../config/problema1_config.h"
-#include "../utilities/file_utility.h"
 #include "procesos_problema1.h"
 
 #ifndef PROBLEMA1_H
@@ -47,6 +46,16 @@ pthread_mutex_t mutex_lectores_activos = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutex_escritores_activos = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutex_escribiendo = PTHREAD_MUTEX_INITIALIZER;
 
+pthread_mutex_t mutex_operacion = PTHREAD_MUTEX_INITIALIZER;
+ pthread_mutex_t mutex_lectura = PTHREAD_MUTEX_INITIALIZER;
+ pthread_mutex_t mutex_escritura = PTHREAD_MUTEX_INITIALIZER;
+
+ pthread_mutex_t mutex_aux_lectura  = PTHREAD_MUTEX_INITIALIZER;
+ pthread_mutex_t mutex_aux_escritura = PTHREAD_MUTEX_INITIALIZER;
+
+ pthread_mutex_t mutex_administracion_lectura_espera = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t mutex_administracion_escritura_espera = PTHREAD_MUTEX_INITIALIZER;
+
 bool inicializado = false;
 
 
@@ -63,8 +72,8 @@ void iniciarProblema1()
 
     // NUEVOS
 
-    sem_init(&sem_lectura, 0, 0);
-    sem_init(&sem_escritura, 0, 0);
+    sem_init(&sem_lectura, 0, 1);
+    sem_init(&sem_escritura, 0, 1);
     sem_init(&sem_administracion, 0, 1);
     sem_init(&sem_administracion_lectura, 0, 0);
     sem_init(&sem_administracion_escritura, 0, 0);
@@ -74,6 +83,12 @@ void iniciarProblema1()
     pthread_mutex_init(&mutex_lectores, NULL);
     pthread_mutex_init(&mutex_escritores, NULL);
     pthread_mutex_init(&mutex_administradores, NULL);
+
+    pthread_mutex_lock(&mutex_lectores_activos);
+    pthread_mutex_lock(&mutex_escritores_activos);
+
+    pthread_mutex_lock(&mutex_administracion_lectura_espera);
+    pthread_mutex_lock(&mutex_administracion_escritura_espera);
 
     // inicializar los lectores
     for (size_t i = 0; i < N_LECTORES; i++)

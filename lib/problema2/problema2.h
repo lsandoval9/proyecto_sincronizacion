@@ -7,7 +7,6 @@
 #include <stdbool.h>
 
 #include "../config/problema2_config.h"
-#include "../utilities/file_utility.h"
 
 #include "../utilities/sleep_thread_utility.h"
 
