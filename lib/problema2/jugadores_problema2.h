@@ -49,12 +49,20 @@ void esperar_reordenamiento();
  */
 int tomar_carta(struct Jugador *data)
 {
+    
     int aux;
-    sem_wait(&mutex_mazo);
-    aux = cartas[carta_actual];
-    carta_actual--;
-    cartas_disponibles--;
-    sem_post(&mutex_mazo);
+    if (cartas_disponibles == 0)
+    {
+        printf("Jugador %ld no hay cartas disponibles\n", data->id);
+        return -1;
+    } else {
+        
+        sem_wait(&mutex_mazo);
+        aux = cartas[carta_actual];
+        carta_actual--;
+        cartas_disponibles--;
+        sem_post(&mutex_mazo);
+    }
 
     return aux;
     

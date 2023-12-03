@@ -204,9 +204,16 @@ void *jugador(void *args)
         
         int carta = tomar_carta(data);
 
-        printf("Jugador %ld tomo carta %d\n", data->id, carta);
+        printf("Hay %d cartas disponibles\n", cartas_disponibles);
 
-        if (carta == CARTA_JUGAR && cartas_disponibles == 0)
+        if (cartas_disponibles == 0)
+        {
+            printf("Jugador %ld no pudo tomar carta\n", data->id);
+        } else {
+            printf("Jugador %ld tomo carta %d\n", data->id, carta);
+        }
+
+        if (carta == CARTA_JUGAR && cartas_disponibles != 0)
         {
             jugar(data);
         }
@@ -230,7 +237,7 @@ void *jefeMesa(void *arg)
     {
 
         pensar_reordenamiento();
-        sem_wait(&mutex_jefe); // !FIXME: no se si esto esta bien
+        sem_wait(&mutex_jefe);
 
         reordenar_tablero();
         
@@ -243,6 +250,7 @@ void *jefeMesa(void *arg)
             colocar_carta_en_mazo(aux, i);
         }
         carta_actual = MAX_CARTAS - 1;
+        cartas_disponibles = MAX_CARTAS;
         for (int i = 0; i < NUM_JUGADORES; i++)
         {
             int aux;
