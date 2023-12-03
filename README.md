@@ -10,7 +10,6 @@
 | Gustavo Herrera | 27.852.734 |
 | Jose David Lopez | 30.077.008 |
 
-[Enlace al repositorio](https://github.com/lsandoval9/proyecto_sincronizacion)
 
 # Descripcion de las partes del proyecto
 
