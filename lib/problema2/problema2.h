@@ -30,7 +30,6 @@ typedef struct Jugador
     long cartas_jugar;
     long cartas_esperar;
     bool esperando;
-
 } Jugador;
 
 /**

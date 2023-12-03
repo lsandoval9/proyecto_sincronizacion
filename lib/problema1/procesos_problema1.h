@@ -11,6 +11,9 @@
 #include "../utilities/file_utility.h"
 #include "../utilities/sleep_thread_utility.h"
 
+
+typedef struct Jugador Jugador;
+
 extern sem_t sem_cola_lectores, sem_lector, sem_contador_lectores;
 extern sem_t sem_contador_escritores, sem_escritor;
 extern int contador_lectores;
@@ -42,9 +45,7 @@ long long administraciones = 0;
 
 void esperar_inicio()
 {
-    while (!inicializado)
-    {
-    }
+    while (!inicializado) {}
 }
 
 /**
@@ -53,6 +54,8 @@ void esperar_inicio()
 void *lector(void *arg)
 {
 
+    Proceso *proceso = (Proceso *)arg;
+
     esperar_inicio();
 
     while (true)
@@ -60,27 +63,28 @@ void *lector(void *arg)
 
         sleep_thread(PROBLEMA1_WAIT_TIME);
 
-        printf("Lector esperando a que no haya administradores ni escritores\n");
+        printf("$ Lector %ld esperando a que no haya administradores ni escritores\n", proceso->id);
         sem_wait(&sem_administracion);
         pthread_mutex_lock(&mutex_lectores); // Bloquear el mutex de lectores
         lectores_activos++;                  // Incrementar el contador de lectores
         if (lectores_activos == 1)
         { // Si es el primer lector
-            printf("Lector esperando a que no haya escritores\n");
+            printf("$ Lector %ld esperando a que no haya escritores\n", proceso->id);
             sem_wait(&sem_escritura); // Esperar a que no haya escritores
-            printf("Lector continuando\n");
+            printf("$ Lector %ld continuando\n", proceso->id);
         }
         pthread_mutex_unlock(&mutex_lectores); // Desbloquear el mutex de lectores
         sem_post(&sem_administracion);         // Permitir que haya administradores
 
         pthread_mutex_lock(&mutex_lectores); // Bloquear el mutex de lectores
         lecturas++;
-        printf("$ Lector leyendo... %lld operaciones de lectura en total\n", lecturas);
+        proceso->operaciones++;
+        printf("$ Lector %ld leyendo... %lld operaciones de lectura en total\n", proceso->id, lecturas);
         lectores_activos--; // Decrementar el contador de lectores
         if (lectores_activos == 0)
         {                             // Si es el último lector
             sem_post(&sem_escritura); // Permitir que haya escritores
-            printf("Lector permitiendo escritores\n");
+            printf("$ Lector %ld permitiendo escritores\n");
         }
         pthread_mutex_unlock(&mutex_lectores); // Desbloquear el mutex de lectores
     }
@@ -93,28 +97,26 @@ void *lector(void *arg)
 void *escritor(void *arg)
 {
 
+    Proceso *proceso = (Proceso *)arg;
+
     esperar_inicio();
 
     while (true)
     {
-
         sleep_thread(PROBLEMA1_WAIT_TIME);
-        printf("Escritor esperando a que no haya administradores ni lectores\n");
+        printf("* Escritor %ld esperando a que no haya administradores ni lectores\n", proceso->id);
         sem_wait(&sem_administracion);         // Esperar a que no haya administradores
         pthread_mutex_lock(&mutex_escritores); // Bloquear el mutex de escritores
         escritores_activos++;                  // Incrementar el contador de escritores
         if (escritores_activos == 1)
         { // Si es el primer escritor
-            printf("Escritor esperando a que no haya lectores\n");
+            printf("* Escritor %ld esperando a que no haya lectores\n", proceso->id);
             sem_wait(&sem_lectura); // Esperar a que no haya lectores
-            printf("Escritor continuando\n");
+            printf("* Escritor %ld continuando\n", proceso->id);
         }
         pthread_mutex_unlock(&mutex_escritores); // Desbloquear el mutex de escritores
+
         sem_post(&sem_administracion);           // Permitir que haya administradores
-
-        sem_wait(&sem_escritura); // Esperar a que no haya otro escritor
-
-        sem_post(&sem_escritura); // Permitir que haya otro escritor
 
         pthread_mutex_lock(&mutex_escritores); // Bloquear el mutex de escritores
         escrituras++;
@@ -122,7 +124,7 @@ void *escritor(void *arg)
         escritores_activos--; // Decrementar el contador de escritores
         if (escritores_activos == 0)
         { // Si es el último escritor
-            printf("Escritor permitiendo lectores\n");
+            printf("* Escritor %ld permitiendo lectores\n", proceso->id);
             sem_post(&sem_lectura); // Permitir que haya lectores
         }
         pthread_mutex_unlock(&mutex_escritores); // Desbloquear el mutex de escritores
@@ -136,6 +138,8 @@ void *escritor(void *arg)
 void *administrador(void *arg)
 {
 
+    Proceso *proceso = (Proceso *)arg;
+
     esperar_inicio();
 
     while (true)
@@ -148,10 +152,11 @@ void *administrador(void *arg)
         if (administradores_activos == 1)
         { // Si es el primer administrador
             sem_wait(&sem_administracion);
-            printf("Administrador continuando\n");
+            printf("# Administrador %ld continuando\n", proceso->id);
         }
         administraciones++;
-        printf("# Administrador administrando... %lld operaciones de administracion en total\n", administraciones);
+        printf("# Administrador %ld administrando... %lld operaciones de administracion en total\n", proceso->id, administraciones);
+        printf("# Hay %d administradores de forma concurrente en la seccion critica\n", administradores_activos);
         pthread_mutex_unlock(&mutex_administradores); // Desbloquear el mutex de administradores
                                                       // Permitir que haya otro administrador
 
@@ -159,6 +164,7 @@ void *administrador(void *arg)
         administradores_activos--;                  // Decrementar el contador de administradores
         if (administradores_activos == 0)
         { // Si es el último administrador
+            printf("# Administrador %ld permitiendo lectores y escritores\n", proceso->id);
             sem_post(&sem_administracion);
         }
         pthread_mutex_unlock(&mutex_administradores); // Desbloquear el mutex de administradores

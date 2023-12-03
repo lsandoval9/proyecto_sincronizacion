@@ -8,6 +8,14 @@
 #include <time.h>
 #include <stdbool.h>
 
+
+typedef struct Proceso
+{
+    long id;
+    long operaciones;
+} Proceso;
+
+
 #include "../config/problema1_config.h"
 #include "../utilities/file_utility.h"
 #include "procesos_problema1.h"
@@ -32,6 +40,8 @@ pthread_mutex_t mutex_lectores;        // Mutex para proteger el contador de lec
 pthread_mutex_t mutex_escritores;      // Mutex para proteger el contador de escritores
 pthread_mutex_t mutex_administradores; // Mutex para proteger el contador de administradores
 bool inicializado = false;
+
+
 
 /**
  * @brief Función que inicializa el problema 1
@@ -58,7 +68,9 @@ void iniciarProblema1()
     // inicializar los lectores
     for (size_t i = 0; i < N_LECTORES; i++)
     {
-        if (pthread_create(&hilo_lector[i], NULL, *lector, NULL) != 0)
+        Proceso *data = malloc(sizeof(Proceso));
+        data->id = i;
+        if (pthread_create(&hilo_lector[i], NULL, *lector, (void *) data) != 0)
         {
             perror("Error al crear el hilo lector");
             exit(EXIT_FAILURE);
@@ -70,7 +82,9 @@ void iniciarProblema1()
     // inicializar los escritores
     for (size_t i = 0; i < N_ESCRITORES; i++)
     {
-        if (pthread_create(&hilo_escritor[i], NULL, *escritor, NULL) != 0)
+        Proceso *data = malloc(sizeof(Proceso));
+        data->id = i;
+        if (pthread_create(&hilo_escritor[i], NULL, *escritor, data) != 0)
         {
             perror("Error al crear el hilo escritor");
             exit(EXIT_FAILURE);
@@ -82,7 +96,9 @@ void iniciarProblema1()
     // inicializar los administradores
     for (size_t i = 0; i < N_ADMINISTRADORES; i++)
     {
-        if (pthread_create(&hilo_administrador[i], NULL, *administrador, NULL) != 0)
+        Proceso *data = malloc(sizeof(Proceso));
+        data->id = i;
+        if (pthread_create(&hilo_administrador[i], NULL, *administrador, data) != 0)
         {
             perror("Error al crear el hilo administrador");
             exit(EXIT_FAILURE);
