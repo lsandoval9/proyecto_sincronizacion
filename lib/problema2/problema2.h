@@ -128,8 +128,6 @@ void empezar_juego_problema2()
 void iniciarProblema2()
 {
 
-    append_to_file(FILENAME_PROBLEMA2, "Iniciando problema 2");
-
     pthread_t *jugadores_t = (pthread_t*) malloc(sizeof(pthread_t) * NUM_JUGADORES);
     pthread_t jefe_t;
     sem_init(&mazo, 0, MAX_CARTAS);
@@ -186,7 +184,7 @@ void *jugador(void *args)
 
     while (true)
     {
-        
+
 
         
         pthread_mutex_lock(&reordenando);
