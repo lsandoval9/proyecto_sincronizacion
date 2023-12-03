@@ -145,7 +145,7 @@ void iniciarProblema2()
     // Inicializar cartas
     for (int i = 0; i < MAX_CARTAS; i++)
     {
-        cartas[i] = ( rand() * 100) % 2;
+        cartas[i] = rand() / (RAND_MAX / 2);
     }
 
     for (long i = 0; i < NUM_JUGADORES; i++)
