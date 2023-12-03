@@ -28,6 +28,8 @@ typedef struct Proceso
 sem_t sem_lectura;                     // Semáforo para controlar el acceso de los lectores
 sem_t sem_escritura;                   // Semáforo para controlar el acceso de los escritores
 sem_t sem_administracion;              // Semáforo para controlar el acceso de los administradores
+sem_t sem_administracion_lectura;      // Semáforo para controlar el acceso de los administradores a la lectura
+sem_t sem_administracion_escritura;    // Semáforo para controlar el acceso de los administradores a la escritura
 int lectores = 0;                          // Contador de lectores activos
 int escritores = 0;                        // Contador de escritores activos
 int administradores = 0;                   // Contador de administradores activos
@@ -36,9 +38,15 @@ int lectores_activos = 0;                 // Contador de lectores activos
 int escritores_activos = 0;               // Contador de escritores activos
 int administradores_activos = 0;          // Contador de administradores activos
 
-pthread_mutex_t mutex_lectores;        // Mutex para proteger el contador de lectores
-pthread_mutex_t mutex_escritores;      // Mutex para proteger el contador de escritores
-pthread_mutex_t mutex_administradores; // Mutex para proteger el contador de administradores
+pthread_mutex_t mutex_lectores = PTHREAD_MUTEX_INITIALIZER;        // Mutex para proteger el contador de lectores
+pthread_mutex_t mutex_escritores = PTHREAD_MUTEX_INITIALIZER;       // Mutex para proteger el contador de escritores
+pthread_mutex_t mutex_administradores = PTHREAD_MUTEX_INITIALIZER;  // Mutex para proteger el contador de administradores
+pthread_mutex_t mutex_administracion_lectura = PTHREAD_MUTEX_INITIALIZER;  // Mutex para proteger el contador de administradores
+pthread_mutex_t mutex_administracion_escritura = PTHREAD_MUTEX_INITIALIZER;  // Mutex para proteger el contador de administradores
+pthread_mutex_t mutex_lectores_activos = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t mutex_escritores_activos = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t mutex_escribiendo = PTHREAD_MUTEX_INITIALIZER;
+
 bool inicializado = false;
 
 
@@ -55,9 +63,11 @@ void iniciarProblema1()
 
     // NUEVOS
 
-    sem_init(&sem_lectura, 0, N_LECTORES);
-    sem_init(&sem_escritura, 0, N_ESCRITORES);
-    sem_init(&sem_administracion, 0, N_ADMINISTRADORES);
+    sem_init(&sem_lectura, 0, 0);
+    sem_init(&sem_escritura, 0, 0);
+    sem_init(&sem_administracion, 0, 1);
+    sem_init(&sem_administracion_lectura, 0, 0);
+    sem_init(&sem_administracion_escritura, 0, 0);
     lectores = 0;
     escritores = 0;
     administradores = 0;
