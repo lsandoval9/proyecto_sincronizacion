@@ -53,7 +53,6 @@ int tomar_carta(struct Jugador *data)
     int aux;
     if (cartas_disponibles == 0)
     {
-        printf("Jugador %ld no hay cartas disponibles\n", data->id);
         return -1;
     } else {
         

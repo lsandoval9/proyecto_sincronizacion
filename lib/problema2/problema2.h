@@ -202,18 +202,17 @@ void *jugador(void *args)
 
         pensar_jugada(data);
         
+        printf("Hay %d cartas disponibles\n", cartas_disponibles);
         int carta = tomar_carta(data);
 
-        printf("Hay %d cartas disponibles\n", cartas_disponibles);
-
-        if (cartas_disponibles == 0)
+        if (carta == -1)
         {
             printf("Jugador %ld no pudo tomar carta\n", data->id);
         } else {
             printf("Jugador %ld tomo carta %d\n", data->id, carta);
         }
 
-        if (carta == CARTA_JUGAR && cartas_disponibles != 0)
+        if (carta == CARTA_JUGAR)
         {
             jugar(data);
         }
