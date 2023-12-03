@@ -44,7 +44,7 @@ int main(int argc, char const *argv[])
         input = atoi(argv[1]);
     }
 
-    // start_stopwatch(input);
+    start_stopwatch(input);
 
     switch (input)
     {

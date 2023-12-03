@@ -157,8 +157,7 @@ void *escritor(void *arg)
             printf("$ Escritor %ld esperando a que no haya lectores \n", proceso->id);
             pthread_mutex_lock(&mutex_lectores_activos);
         }
-
-        printf("$ Incrementando escritores activos a %d\n", escritores_activos);
+        printf("$ Escritor %ld en espera para escribir\n", proceso->id);
         pthread_mutex_unlock(&mutex_escritura);
         pthread_mutex_unlock(&mutex_operacion);
 
@@ -169,7 +168,7 @@ void *escritor(void *arg)
 
         pthread_mutex_lock(&mutex_aux_escritura);
         escritores_activos--;
-        printf("$ Decrementando escritores activos a %d\n", escritores_activos);
+        printf("$ Decrementando escritores en espera a %d\n", escritores_activos);
         if (escritores_activos == 0)
         {
             printf("$ Escritor %ld permitiendo lectores \n", proceso->id);
