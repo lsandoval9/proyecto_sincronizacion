@@ -121,7 +121,7 @@ sem_t sem_ordernamiento;
 
 void empezar_juego_problema2()
 {
-    empezar_juego = true;
+    while (!empezar_juego) {}
 }
 
 // Funcion principal
