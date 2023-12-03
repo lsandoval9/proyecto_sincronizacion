@@ -27,22 +27,16 @@ extern pthread_mutex_t mutex_cartas_jugar;
 extern pthread_mutex_t mutex_cartas_esperar;
 
 // variables externas
-extern sem_t mazo, reordenando, mutex_mazo;
-extern int num_jugadores;
-extern int cartas[MAX_CARTAS];
+extern bool empezar_juego;
+extern int jugadores_jugando;
 extern int cartas_disponibles;
-extern int n_esperando;
-
-extern bool jefe_esperando;
-extern bool reordena;
-extern bool reordenamiento_terminado;
-extern sem_t sem_jugadores;
-
-extern int sem_jugadores_value;
+extern int carta_actual;
+extern bool jugadores_jugando_bool[NUM_JUGADORES];
 // mutex
 
 extern pthread_mutex_t mutex_cartas_disponibles;
 extern pthread_mutex_t mutex_reordenando;
+extern pthread_mutex_t mutex_mazo;
 extern sem_t mutex_jefe;
 
 void pensar_jugada();
@@ -55,90 +49,46 @@ void esperar_reordenamiento();
  */
 int tomar_carta(struct Jugador *data)
 {
-
-    if (reordena) {
-
-        //cambios aqui
-        pthread_mutex_lock(&mutex_jugadores_disponibles);
-        n_esperando++;
-        pthread_mutex_unlock(&mutex_jugadores_disponibles);
-
-        sem_wait(&sem_jugadores);
-
-
-
-    }
-
-    sem_wait(&mazo);
+    int aux;
     sem_wait(&mutex_mazo);
-    int aux = cartas[cartas_disponibles - 1];
-    data->carta = aux;
-    printf("Jugador %ld tomo carta %d\n", data->id, aux);
-    printf("Cartas disponibles: %d\n", cartas_disponibles-1);
-    pthread_mutex_lock(&mutex_cartas_disponibles);
+    aux = cartas[carta_actual];
+    carta_actual--;
     cartas_disponibles--;
-    pthread_mutex_unlock(&mutex_cartas_disponibles);
-    if (cartas_disponibles == 0)
-    {
-        printf("Ya no hay cartas disponibles\n");
-        sem_post(&mutex_jefe);
-    }
     sem_post(&mutex_mazo);
 
-    
-
     return aux;
+    
 }
 
 void pensar_jugada(struct Jugador *data)
 {
-    printf("Jugador %ld pensando jugada\n", data->id);
-
-    if (reordena) {
-        printf("Jugador %ld en espera reordenamiento\n", data->id);
-
-        //cambios aqui
-        pthread_mutex_lock(&mutex_jugadores_disponibles);
-        n_esperando++;
-        pthread_mutex_unlock(&mutex_jugadores_disponibles);
-
-        sem_wait(&sem_jugadores);
-    }
+    printf("Jugador %d pensando jugada\n", data->id);
 }
 
 void jugar(struct Jugador *data)
 {
-
-    if (data->carta == CARTA_ESPERAR)
-    {
-  
-        
-        data->cartas_esperar++;
-        printf("Jugador %ld tiene %d cartas esperar\n", data->id, data->cartas_esperar);
-
-        pthread_mutex_lock(&mutex_cartas_esperar);
-        estadisticas.cartas_esperar_total += 1;
-        printf("Hay %d cartas esperar en total\n", estadisticas.cartas_esperar_total);
-        pthread_mutex_unlock(&mutex_cartas_esperar);
-
-    }
-    else
-    {
-        printf("Jugador %ld jugando\n", data->id);
-
-        pthread_mutex_lock(&mutex_cartas_jugar);
-        data->cartas_jugar++;
-        pthread_mutex_unlock(&mutex_cartas_jugar);
-        printf("Jugador %ld tiene %d cartas jugar\n", data->id, data->cartas_jugar);
-
-        pthread_mutex_lock(&mutex_cartas_jugar);
-        estadisticas.cartas_jugar_total++;
-        printf("Hay %d cartas jugar en total\n", estadisticas.cartas_jugar_total);
-        pthread_mutex_unlock(&mutex_cartas_jugar);
-
-    }
+    printf("Jugador %ld jugando\n", data->id);
 }
 
+void esperar_reordenamiento(struct Jugador *data)
+{
 
+    pthread_mutex_lock(&mutex_jugadores);
+    jugadores_jugando--;
+    jugadores_jugando_bool[data->id] = false;
+    printf("Jugador %ld esperando reordenamiento %d\n", data->id, jugadores_jugando);
+    if (jugadores_jugando == 0)
+    {
+        printf("Se da la señal de reordenamiento\n");
+        sem_post(&mutex_jefe);
+        pthread_mutex_unlock(&reordenando);
+        
+    }
+    pthread_mutex_unlock(&mutex_jugadores);
+    
+    sem_wait(&jugadores_disponibles);
+    printf("Pasa el jugador %ld\n", data->id);
+
+}
 
 #endif // JUGADORES_PROBLEMA2_H
