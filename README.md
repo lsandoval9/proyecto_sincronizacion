@@ -11,7 +11,7 @@
 | Jose David Lopez | 30.077.008 |
 
 
-- **problema seleccionado en la parte 2:** problema 2
+**problema seleccionado en la parte 2:** problema 2
 
 # Descripcion de las partes del proyecto
 
@@ -36,7 +36,7 @@ Se crearon varias utilidades con propositos de facilitar el desarrollo y la mues
 
 Esta libreria contiene funciones para la escritura de archivos en la carpeta ./out del proyecto.
 
-- sleep_threaad_utility.h:
+- recources.h:
 
 Esta libreria contiene una funcionalidad para dormir un hilo X nanosegundos. Esto se hizo con fines de facilitar el seguimiento de los hilos en la terminal.
 

@@ -44,8 +44,6 @@ typedef struct EstadisticasPartida
     int cartas_esperar_total;
 } EstadisticasPartida;
 
-
-
 // prototipos de funciones
 /**
  * @brief funcion que representa la ejecucion de un jugador
@@ -58,7 +56,6 @@ void *jefeMesa(void *data);
 
 // semaforo
 sem_t mazo;
-
 sem_t jugadores;
 sem_t mutex_jefe;
 sem_t jugadores_disponibles;
@@ -79,7 +76,6 @@ int jugadores_jugando = NUM_JUGADORES;
 // Estadisticas
 EstadisticasPartida estadisticas = {0, 0, 0};
 
-
 int carta_actual = MAX_CARTAS - 1;
 int cartas_disponibles = MAX_CARTAS;
 
@@ -96,6 +92,8 @@ pthread_mutex_t mutex_mazo = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutex_jugadores = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t reordenando = PTHREAD_MUTEX_INITIALIZER;
 
+pthread_mutex_t mutex_jugando = PTHREAD_MUTEX_INITIALIZER;
+
 // Mutex para estadisticas
 pthread_mutex_t mutex_reordenadas_total = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutex_cartas_jugar_total = PTHREAD_MUTEX_INITIALIZER;
@@ -104,9 +102,9 @@ pthread_mutex_t mutex_cartas_esperar_total = PTHREAD_MUTEX_INITIALIZER;
 // mutex estadisticas del jugador
 pthread_mutex_t mutex_cartas_jugar = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutex_cartas_esperar = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t mutex_ordenadas = PTHREAD_MUTEX_INITIALIZER;
 
-
-pthread_mutex_t mutex_ordenamiento = PTHREAD_MUTEX_INITIALIZER;
+int total_reordenamiento;
 sem_t sem_ordernamiento;
 
 /**
@@ -116,17 +114,18 @@ sem_t sem_ordernamiento;
 #include "jugadores_problema2.h"
 #include "jefe_mesa_problema2.h"
 
-
 void empezar_juego_problema2()
 {
-    while (!empezar_juego) {}
+    while (!empezar_juego)
+    {
+    }
 }
 
 // Funcion principal
 void iniciarProblema2()
 {
 
-    pthread_t *jugadores_t = (pthread_t*) malloc(sizeof(pthread_t) * NUM_JUGADORES);
+    pthread_t *jugadores_t = (pthread_t *)malloc(sizeof(pthread_t) * NUM_JUGADORES);
     pthread_t jefe_t;
     sem_init(&mazo, 0, MAX_CARTAS);
     sem_init(&reordenando, 0, 0);
@@ -183,12 +182,10 @@ void *jugador(void *args)
     while (true)
     {
 
-
-        
         pthread_mutex_lock(&reordenando);
         pthread_mutex_unlock(&reordenando);
         pthread_mutex_lock(&mutex_jugadores);
-        
+
         if (!jugadores_jugando_bool[data->id])
         {
             jugadores_jugando_bool[data->id] = true;
@@ -198,26 +195,8 @@ void *jugador(void *args)
         pthread_mutex_unlock(&mutex_jugadores);
 
         pensar_jugada(data);
-        
-        
-        int carta = tomar_carta(data);
 
-        if (carta == -1)
-        {
-            printf("Jugador %ld no pudo tomar carta\n", data->id);
-        } else {
-            printf("Jugador %ld tomo carta %d\n", data->id, carta);
-        }
-
-        if (carta == CARTA_JUGAR)
-        {
-            jugar(data);
-        }
-        else
-        {
-            esperar_reordenamiento(data);
-        }
-        
+        tomar_carta(data);
     }
 
     pthread_exit(NULL);
@@ -225,7 +204,6 @@ void *jugador(void *args)
 
 void *jefeMesa(void *arg)
 {
-
 
     empezar_juego_problema2();
 
@@ -236,10 +214,12 @@ void *jefeMesa(void *arg)
         sem_wait(&mutex_jefe);
 
         reordenar_tablero();
-        
+
         pthread_mutex_lock(&reordenando);
 
         sem_wait(&mutex_mazo);
+        total_reordenamiento++;
+        printf("Total de reordenamientos: %i \n", total_reordenamiento);
         for (int i = 0; i < MAX_CARTAS; i++)
         {
             int aux = elegir_proxima_carta();
@@ -258,7 +238,6 @@ void *jefeMesa(void *arg)
         jugadores_jugando = NUM_JUGADORES;
         sem_post(&mutex_mazo);
         pthread_mutex_unlock(&reordenando);
-        
     }
 
     pthread_exit(NULL);

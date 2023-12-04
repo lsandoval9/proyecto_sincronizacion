@@ -115,7 +115,6 @@ void iniciarProblema1()
             exit(EXIT_FAILURE);
         }
         escritores++;
-        
     }
 
     // inicializar los administradores
@@ -155,15 +154,12 @@ void iniciarProblema1()
     }
 
     // liberar memoria
-
     sem_destroy(&sem_lectura);
     sem_destroy(&sem_escritura);
     sem_destroy(&sem_administracion);
     pthread_mutex_destroy(&mutex_lectores);
     pthread_mutex_destroy(&mutex_escritores);
     pthread_mutex_destroy(&mutex_administradores);
-
-
 }
 
 #endif

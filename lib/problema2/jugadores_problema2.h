@@ -11,7 +11,6 @@
 
 #define JUGADORES_PROBLEMA2_H
 
-
 // external typedef
 typedef struct Jugador Jugador;
 
@@ -25,6 +24,7 @@ extern pthread_mutex_t mutex_cartas_esperar_total;
 // mutex jugadores
 extern pthread_mutex_t mutex_cartas_jugar;
 extern pthread_mutex_t mutex_cartas_esperar;
+extern pthread_mutex_t mutex_jugando;
 
 // variables externas
 extern bool empezar_juego;
@@ -40,31 +40,51 @@ extern pthread_mutex_t mutex_mazo;
 extern sem_t mutex_jefe;
 
 void pensar_jugada();
-int tomar_carta(struct Jugador *data);
+void tomar_carta(struct Jugador *data);
 void jugar();
 void esperar_reordenamiento();
 
 /**
  * @brief retorna un numero aleatorio entre 0 y 1
  */
-int tomar_carta(struct Jugador *data)
+void tomar_carta(struct Jugador *data)
 {
-    
+
     int aux;
+    sem_wait(&mutex_mazo);
+
     if (cartas_disponibles <= 0)
     {
-        return -1;
-    } else {
-        sem_wait(&mutex_mazo);
+        aux = -1;
+    }
+    else
+    {
         printf("Hay %d cartas disponibles\n", cartas_disponibles);
         aux = cartas[carta_actual];
         carta_actual--;
         cartas_disponibles--;
-        sem_post(&mutex_mazo);
     }
 
-    return aux;
-    
+    pthread_mutex_lock(&mutex_jugando);
+    if (aux == -1)
+    {
+        printf("Jugador %ld no pudo tomar carta\n", data->id);
+    }
+    else
+    {
+        printf("Jugador %ld tomo carta %d\n", data->id, aux);
+    }
+    sem_post(&mutex_mazo);
+    if (aux == CARTA_JUGAR)
+    {
+        jugar(data);
+        pthread_mutex_unlock(&mutex_jugando);
+    }
+    else
+    {
+        printf("Jugador %ld esperando reordenamiento\n", data->id);
+        esperar_reordenamiento(data);
+    }
 }
 
 void pensar_jugada(struct Jugador *data)
@@ -85,20 +105,17 @@ void esperar_reordenamiento(struct Jugador *data)
     pthread_mutex_lock(&mutex_jugadores);
     jugadores_jugando--;
     jugadores_jugando_bool[data->id] = false;
-    printf("Jugador %ld esperando reordenamiento\n", data->id);
     printf("Jugadores en partida: %d\n", jugadores_jugando);
+    pthread_mutex_unlock(&mutex_jugando);
     if (jugadores_jugando == 0)
     {
         printf("Se da la señal de reordenamiento\n");
         sem_post(&mutex_jefe);
         pthread_mutex_unlock(&reordenando);
-        
     }
     pthread_mutex_unlock(&mutex_jugadores);
-    
     sem_wait(&jugadores_disponibles);
     printf("Pasa el jugador %ld\n", data->id);
-
 }
 
 #endif // JUGADORES_PROBLEMA2_H
