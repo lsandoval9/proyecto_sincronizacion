@@ -51,12 +51,12 @@ int tomar_carta(struct Jugador *data)
 {
     
     int aux;
-    if (cartas_disponibles == 0)
+    if (cartas_disponibles <= 0)
     {
         return -1;
     } else {
-        
         sem_wait(&mutex_mazo);
+        printf("Hay %d cartas disponibles\n", cartas_disponibles);
         aux = cartas[carta_actual];
         carta_actual--;
         cartas_disponibles--;
@@ -70,11 +70,13 @@ int tomar_carta(struct Jugador *data)
 void pensar_jugada(struct Jugador *data)
 {
     printf("Jugador %ld pensando jugada\n", data->id);
+    sleep_thread(PROBLEMA2_WAIT_TIME);
 }
 
 void jugar(struct Jugador *data)
 {
     printf("Jugador %ld jugando\n", data->id);
+    sleep_thread(PROBLEMA2_WAIT_TIME);
 }
 
 void esperar_reordenamiento(struct Jugador *data)

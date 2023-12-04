@@ -199,7 +199,7 @@ void *jugador(void *args)
 
         pensar_jugada(data);
         
-        printf("Hay %d cartas disponibles\n", cartas_disponibles);
+        
         int carta = tomar_carta(data);
 
         if (carta == -1)
