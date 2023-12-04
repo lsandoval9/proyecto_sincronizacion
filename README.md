@@ -11,6 +11,8 @@
 | Jose David Lopez | 30.077.008 |
 
 
+- **problema seleccionado en la parte 2:** problema 2
+
 # Descripcion de las partes del proyecto
 
 
@@ -67,7 +69,7 @@ Contiene constantes para configurar los parametros del problema 1, entre ellos, 
 #define N_LECTORES 3 // cantidad de lectores
 #define N_ESCRITORES 3 // cantidad de escritores
 #define N_ADMINISTRADORES 3 // cantidad de administradores
-#define PROBLEMA1_WAIT_TIME 0 //25000000 // tiempo de espera para el problema 1
+#define PROBLEMA1_RECURSOS 0 //25000000 // tiempo de retardo para problema 1
 ```
 
 * problema2_config.h:
@@ -79,5 +81,25 @@ Contiene constantes para configurar los parametros del problema 2, como el numer
 #define CARTA_JUGAR 1  // carta que indica que el jugador debe jugar
 #define MAX_CARTAS 10 // numero maximo de cartas en el mazo
 #define NUM_JUGADORES 10 // numero de jugadores
-#define PROBLEMA2_WAIT_TIME 0 // 225000000 // tiempo de espera para el problema 1
+#define PROBLEMA2_RECURSOS 0 // 225000000 // tiempo de espera para el problema 1
+```
+
+## Ejecucion del programa
+
+Para ejecutar el programa, se debe ejecutar el siguiente comando:
+
+```sh
+./exec.bash <numero del problema : 0|1> 
+```
+
+Ejemplo para ejecutar el problema 1:
+
+```sh
+./exec.bash 1
+```
+
+Ejemplo para ejecutar el problema 2:
+
+```sh
+./exec.bash 2
 ```
