@@ -192,9 +192,8 @@ void *jugador(void *args)
         if (!jugadores_jugando_bool[data->id])
         {
             jugadores_jugando_bool[data->id] = true;
-            printf("Jugador %ld jugando\n", data->id);
+            printf("Jugador %ld ingresa al turno\n", data->id);
         }
-        printf("Jugadores jugando: %d\n", jugadores_jugando);
 
         pthread_mutex_unlock(&mutex_jugadores);
 

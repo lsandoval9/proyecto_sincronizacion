@@ -84,6 +84,7 @@ void esperar_reordenamiento(struct Jugador *data)
     jugadores_jugando--;
     jugadores_jugando_bool[data->id] = false;
     printf("Jugador %ld esperando reordenamiento %d\n", data->id, jugadores_jugando);
+    printf("Jugadores en partida: %d\n", jugadores_jugando);
     if (jugadores_jugando == 0)
     {
         printf("Se da la señal de reordenamiento\n");
