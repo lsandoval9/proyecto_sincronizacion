@@ -69,7 +69,7 @@ int tomar_carta(struct Jugador *data)
 
 void pensar_jugada(struct Jugador *data)
 {
-    printf("Jugador %d pensando jugada\n", data->id);
+    printf("Jugador %ld pensando jugada\n", data->id);
 }
 
 void jugar(struct Jugador *data)
@@ -83,7 +83,7 @@ void esperar_reordenamiento(struct Jugador *data)
     pthread_mutex_lock(&mutex_jugadores);
     jugadores_jugando--;
     jugadores_jugando_bool[data->id] = false;
-    printf("Jugador %ld esperando reordenamiento %d\n", data->id, jugadores_jugando);
+    printf("Jugador %ld esperando reordenamiento\n", data->id);
     printf("Jugadores en partida: %d\n", jugadores_jugando);
     if (jugadores_jugando == 0)
     {

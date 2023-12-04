@@ -12,7 +12,7 @@
 
 // variables
 extern bool empezar_juego;
-extern cartas[10];
+extern int cartas[10];
 // estadisticas
 
 extern struct EstadisticasPartida estadisticas;
