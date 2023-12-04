@@ -78,7 +78,7 @@ void *lector(void *arg)
     while (true)
     {
 
-        sleep_thread(PROBLEMA1_WAIT_TIME);
+        recursos(PROBLEMA1_RECURSOS);
 
         printf("# lector %ld pregunta si hay administradores administrando\n", proceso->id);
         pthread_mutex_lock(&mutex_administracion_lectura);
@@ -111,6 +111,7 @@ void *lector(void *arg)
         printf("# Lector %ld leyendo...\n", proceso->id);
         printf("# \033[1;34mLECTURAS TOTALES: %lld\033[0m\n", lecturas);
         printf("# LECTURAS TOTALES: %lld\n", lecturas);
+        recursos(PROBLEMA1_RECURSOS);
 
         pthread_mutex_lock(&mutex_aux_lectura);
         lectores_activos--;
@@ -138,7 +139,6 @@ void *escritor(void *arg)
 
     while (true)
     {
-        sleep_thread(PROBLEMA1_WAIT_TIME);
 
         
         pthread_mutex_lock(&mutex_administracion_escritura);
@@ -172,6 +172,7 @@ void *escritor(void *arg)
         printf("$ escritor %ld escribiendo...\n", proceso->id);
         printf("$ \033[1;31mESCRITURAS TOTALES: %lld\033[0m\n", escrituras);
         printf("$ ESCRITURAS TOTALES: %lld\n", escrituras);
+        recursos(PROBLEMA1_RECURSOS);
         pthread_mutex_unlock(&mutex_escribiendo);
 
         pthread_mutex_lock(&mutex_aux_escritura);
@@ -200,7 +201,6 @@ void *administrador(void *arg)
 
     while (true)
     {
-        sleep_thread(PROBLEMA1_WAIT_TIME);
         // Repetir indefinidamente
         // Esperar a que no haya otro administrador
         pthread_mutex_lock(&mutex_administradores); // Bloquear el mutex de administradores
@@ -209,6 +209,7 @@ void *administrador(void *arg)
         printf("- Administrador %ld administrando... %lld operaciones de administracion en total\n", proceso->id, administraciones);
         printf("- \033[1;32mADMINISTRACIONES TOTALES: %lld\033[0m\n", administraciones);
         printf("- ADMINISTRACIONES TOTALES: %lld\n", administraciones);
+        recursos(PROBLEMA1_RECURSOS);
         pthread_mutex_unlock(&mutex_administradores); // Desbloquear el mutex de administradores
                                                       // Permitir que haya otro administrador
 

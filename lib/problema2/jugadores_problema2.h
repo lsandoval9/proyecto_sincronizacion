@@ -70,13 +70,13 @@ int tomar_carta(struct Jugador *data)
 void pensar_jugada(struct Jugador *data)
 {
     printf("Jugador %ld pensando jugada\n", data->id);
-    sleep_thread(PROBLEMA2_WAIT_TIME);
+    recursos(PROBLEMA2_RECURSOS);
 }
 
 void jugar(struct Jugador *data)
 {
     printf("Jugador %ld jugando\n", data->id);
-    sleep_thread(PROBLEMA2_WAIT_TIME);
+    recursos(PROBLEMA2_RECURSOS);
 }
 
 void esperar_reordenamiento(struct Jugador *data)

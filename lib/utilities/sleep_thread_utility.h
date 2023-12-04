@@ -8,7 +8,7 @@
 
 #define SLEEP_THREAD_UTILITY_H
 
-void sleep_thread(long long nanoseconds) {
+void recursos(long long nanoseconds) {
 
     if (nanoseconds <= 0) {
         return;

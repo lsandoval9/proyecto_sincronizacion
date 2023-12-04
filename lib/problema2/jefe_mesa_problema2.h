@@ -35,13 +35,13 @@ void colocar_carta_en_mazo(int carta, int i);
 void reordenar_tablero()
 {
     printf("Jefe de mesa reordenando tablero\n");
-    sleep_thread(PROBLEMA2_WAIT_TIME);
+    recursos(PROBLEMA2_RECURSOS);
 }
 
 void pensar_reordenamiento()
 {
     printf("Jefe de mesa pensando reordenamiento\n");
-    sleep_thread(PROBLEMA2_WAIT_TIME);
+    recursos(PROBLEMA2_RECURSOS);
 }
 
 int elegir_proxima_carta()
