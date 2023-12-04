@@ -170,8 +170,8 @@ void *escritor(void *arg)
         pthread_mutex_lock(&mutex_escribiendo);
         escrituras++;
         printf("$ escritor %ld escribiendo...\n", proceso->id);
-        printf("# \033[1;31mESCRITURAS TOTALES: %lld\033[0m\n", escrituras);
-        printf("# ESCRITURAS TOTALES: %lld\n", escrituras);
+        printf("$ \033[1;31mESCRITURAS TOTALES: %lld\033[0m\n", escrituras);
+        printf("$ ESCRITURAS TOTALES: %lld\n", escrituras);
         pthread_mutex_unlock(&mutex_escribiendo);
 
         pthread_mutex_lock(&mutex_aux_escritura);
@@ -207,8 +207,8 @@ void *administrador(void *arg)
         administradores_activos++;
         administraciones++;
         printf("- Administrador %ld administrando... %lld operaciones de administracion en total\n", proceso->id, administraciones);
-        printf("# \033[1;32mADMINISTRACIONES TOTALES: %lld\033[0m\n", escrituras);
-        printf("# ADMINISTRACIONES TOTALES: %lld\n", escrituras);
+        printf("- \033[1;32mADMINISTRACIONES TOTALES: %lld\033[0m\n", escrituras);
+        printf("- ADMINISTRACIONES TOTALES: %lld\n", escrituras);
         pthread_mutex_unlock(&mutex_administradores); // Desbloquear el mutex de administradores
                                                       // Permitir que haya otro administrador
 
