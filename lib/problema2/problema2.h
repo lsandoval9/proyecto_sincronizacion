@@ -105,7 +105,6 @@ pthread_mutex_t mutex_cartas_esperar = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutex_ordenadas = PTHREAD_MUTEX_INITIALIZER;
 
 int total_reordenamiento;
-sem_t sem_ordernamiento;
 
 /**
  * archivos de cabecera. Se coloca aqui para evitar errores de compilacion
@@ -132,7 +131,6 @@ void iniciarProblema2()
     sem_init(&mutex_jefe, 0, 0);
     sem_init(&mutex_mazo, 0, 1);
     sem_init(&jugadores_disponibles, 0, 0);
-    sem_init(&sem_ordernamiento, 0, 0);
 
     // inicializar mutex axiliares
 

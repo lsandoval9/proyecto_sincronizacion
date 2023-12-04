@@ -27,6 +27,8 @@ extern pthread_mutex_t mutex_reordenando;
 extern sem_t mutex_jefe;
 extern sem_t jugadores_disponibles;
 
+extern int total_reordenadas;
+
 void pensar_reordenamiento();
 void reordenar_tablero();
 int elegir_proxima_carta();
