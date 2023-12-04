@@ -207,8 +207,8 @@ void *administrador(void *arg)
         administradores_activos++;
         administraciones++;
         printf("- Administrador %ld administrando... %lld operaciones de administracion en total\n", proceso->id, administraciones);
-        printf("- \033[1;32mADMINISTRACIONES TOTALES: %lld\033[0m\n", escrituras);
-        printf("- ADMINISTRACIONES TOTALES: %lld\n", escrituras);
+        printf("- \033[1;32mADMINISTRACIONES TOTALES: %lld\033[0m\n", administraciones);
+        printf("- ADMINISTRACIONES TOTALES: %lld\n", administraciones);
         pthread_mutex_unlock(&mutex_administradores); // Desbloquear el mutex de administradores
                                                       // Permitir que haya otro administrador
 
