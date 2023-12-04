@@ -8,7 +8,7 @@
 #include <stdbool.h>
 
 #include "../config/problema1_config.h"
-#include "../utilities/sleep_thread_utility.h"
+#include "../utilities/resources_utility.h"
 
 typedef struct Jugador Jugador;
 

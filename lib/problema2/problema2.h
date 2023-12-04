@@ -8,7 +8,7 @@
 
 #include "../config/problema2_config.h"
 
-#include "../utilities/sleep_thread_utility.h"
+#include "../utilities/resources_utility.h"
 
 #ifndef PROBLEMA2_H
 
