@@ -4,9 +4,9 @@
 
 #include <time.h>
 
-#ifndef SLEEP_THREAD_UTILITY_H
+#ifndef RESOURCES_UTILITY_H
 
-#define SLEEP_THREAD_UTILITY_H
+#define RESOURCES_UTILITY_H
 
 void recursos(long long nanoseconds) {
 
@@ -21,4 +21,4 @@ void recursos(long long nanoseconds) {
 }
 
 
-#endif //SLEEP_THREAD_UTILITY_H
+#endif //RESOURCES_UTILITY_H
