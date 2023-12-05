@@ -39,9 +39,9 @@ typedef struct Jugador
  */
 typedef struct EstadisticasPartida
 {
-    int reordenadas_total;
-    int cartas_jugar_total;
-    int cartas_esperar_total;
+    long reordenadas_total;
+    long cartas_jugar_total;
+    long cartas_esperar_total;
 } EstadisticasPartida;
 
 // prototipos de funciones
@@ -127,9 +127,7 @@ void iniciarProblema2()
     pthread_t *jugadores_t = (pthread_t *)malloc(sizeof(pthread_t) * NUM_JUGADORES);
     pthread_t jefe_t;
     sem_init(&mazo, 0, MAX_CARTAS);
-    sem_init(&reordenando, 0, 0);
     sem_init(&mutex_jefe, 0, 0);
-    sem_init(&mutex_mazo, 0, 1);
     sem_init(&jugadores_disponibles, 0, 0);
 
     // inicializar mutex axiliares
@@ -215,7 +213,7 @@ void *jefeMesa(void *arg)
 
         pthread_mutex_lock(&reordenando);
 
-        sem_wait(&mutex_mazo);
+        pthread_mutex_lock(&mutex_mazo);
         total_reordenamiento++;
         printf("Total de reordenamientos: %i \n", total_reordenamiento);
         for (int i = 0; i < MAX_CARTAS; i++)
@@ -234,7 +232,7 @@ void *jefeMesa(void *arg)
             printf("Jugadores habilitados: %d\n", aux);
         }
         jugadores_jugando = NUM_JUGADORES;
-        sem_post(&mutex_mazo);
+        pthread_mutex_unlock(&mutex_mazo);
         pthread_mutex_unlock(&reordenando);
     }
 

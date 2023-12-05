@@ -92,11 +92,6 @@ void *lector(void *arg)
 
         pthread_mutex_lock(&mutex_operacion);
         pthread_mutex_lock(&mutex_lectura);
-
-        pthread_mutex_lock(&mutex_aux_lectura);
-        lectores_activos++;
-        lecturas++;
-        pthread_mutex_unlock(&mutex_aux_lectura);
         printf("# Lector %ld preguntando si hay escritores\n", proceso->id);
         if (escritores_activos > 0)
         { // Si hay lectores
@@ -104,14 +99,19 @@ void *lector(void *arg)
             pthread_mutex_lock(&mutex_escritores_activos);
             printf("# Lector %ld termino de esperar por escritores\n", proceso->id);
         }
-
+        pthread_mutex_lock(&mutex_aux_lectura);
+        lectores_activos++;
+        lecturas++;
+        pthread_mutex_unlock(&mutex_aux_lectura);
         pthread_mutex_unlock(&mutex_lectura);
         pthread_mutex_unlock(&mutex_operacion);
+
 
         printf("# Lector %ld leyendo...\n", proceso->id);
         printf("# \033[1;34mLECTURAS TOTALES: %lld\033[0m\n", lecturas);
         printf("# LECTURAS TOTALES: %lld\n", lecturas);
         recursos(PROBLEMA1_RECURSOS);
+
 
         pthread_mutex_lock(&mutex_aux_lectura);
         lectores_activos--;
@@ -154,15 +154,16 @@ void *escritor(void *arg)
         pthread_mutex_lock(&mutex_operacion);
         pthread_mutex_lock(&mutex_escritura);
 
-        pthread_mutex_lock(&mutex_aux_escritura);
-        escritores_activos++;
-        pthread_mutex_unlock(&mutex_aux_escritura);
+        
         printf("$ Escritor %ld preguntando si hay lectores\n", proceso->id);
         if (lectores_activos > 0)
         { // Si hay lectores
             printf("$ Escritor %ld esperando a que no haya lectores \n", proceso->id);
             pthread_mutex_lock(&mutex_lectores_activos);
         }
+        pthread_mutex_lock(&mutex_aux_escritura);
+        escritores_activos++;
+        pthread_mutex_unlock(&mutex_aux_escritura);
         printf("$ Escritor %ld en espera para escribir\n", proceso->id);
         pthread_mutex_unlock(&mutex_escritura);
         pthread_mutex_unlock(&mutex_operacion);

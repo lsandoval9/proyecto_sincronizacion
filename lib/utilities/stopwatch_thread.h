@@ -14,7 +14,6 @@
 
 
 void* stopwatch_thread(void* arg) {
-    int selected = *((int *)arg);
     while (1) {
         nanosleep((const struct timespec[]){{0, INTERVAL}}, NULL); // Sleep for 0.1 seconds
         print_time(); // Call the print_time function

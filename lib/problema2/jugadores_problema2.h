@@ -51,7 +51,7 @@ void tomar_carta(struct Jugador *data)
 {
 
     int aux;
-    sem_wait(&mutex_mazo);
+    pthread_mutex_lock(&mutex_mazo);
 
     if (cartas_disponibles <= 0)
     {
@@ -77,20 +77,20 @@ void tomar_carta(struct Jugador *data)
         {
             estadisticas.cartas_jugar_total++;
             data->cartas_jugar++;
-            printf("El jugador %ld ha jugado %d cartas para jugar\n", data->id, data->cartas_jugar);
-            printf("Se han jugado %d cartas para jugar en total\n", estadisticas.cartas_jugar_total);
+            printf("El jugador %ld ha jugado %ld cartas de jugar en total\n", data->id, data->cartas_jugar);
+            printf("Se han jugado %ld cartas para jugar en total\n", estadisticas.cartas_jugar_total);
             
         }
         else if (aux == CARTA_ESPERAR)
         {
             estadisticas.cartas_esperar_total++;
             data->cartas_esperar++;
-            printf("El jugador %ld ha jugado %d cartas para esperar\n", data->id, data->cartas_esperar);
-            printf("Se han jugado %d cartas para esperar en total\n", estadisticas.cartas_esperar_total);
+            printf("El jugador %ld ha jugado %ld cartas de esperar en total\n", data->id, data->cartas_esperar);
+            printf("Se han jugado %ld cartas para esperar en total\n", estadisticas.cartas_esperar_total);
         }
     }
 
-    sem_post(&mutex_mazo);
+    pthread_mutex_unlock(&mutex_mazo);
     if (aux == CARTA_JUGAR)
     {
         jugar(data);
